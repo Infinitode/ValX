@@ -1,19 +1,15 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='pywebscrapr',
+    name='valx',
     version='{{VERSION_PLACEHOLDER}}',
     author='Infinitode Pty Ltd',
     author_email='infinitode.ltd@gmail.com',
-    description='An open-source Python library for web scraping tasks.',
-    long_description='An open-source Python library for web scraping tasks. Includes support for both image scraping and text scraping.',
+    description='An open-source Python library for text cleaning tasks.',
+    long_description='An open-source Python library for data cleaning tasks. Includes profanity detection, and removal.',
     long_description_content_type='text/markdown',
-    url='https://github.com/infinitode/pywebscrapr',
+    url='https://github.com/infinitode/valx',
     packages=find_packages(),
-    install_requires=[
-        'requests',
-        'beautifulsoup4',
-    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
