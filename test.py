@@ -8,11 +8,11 @@ def main():
     ]
 
     # Detect profanity
-    num_profanities = detect_profanity(sample_text, language='English')
+    num_profanities = detect_profanity(sample_text, language='All')
 
     print(f"Number of profanities detected: {num_profanities}")
 
-    removed = remove_profanity(sample_text, "text_cleaned.txt", language="English")
+    removed = remove_profanity(sample_text, "text_cleaned.txt", language="All")
 
 if __name__ == "__main__":
     main()
