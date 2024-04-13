@@ -10,50 +10,6 @@ Creative Commons Attribution 4.0 International License:
 https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/LICENSE
 '''
 
-
-# def load_profanity_words(language='English'):
-#     """
-#     Load profanity words from the local text file.
-
-#     Args:
-#         language (str): The language for which to load profanity words. Defaults to 'English'.
-
-#     Returns:
-#         list: A list of profanity words for the specified language, or all languages if 'All' is specified.
-#     """
-#     file_path = os.path.join(os.path.dirname(__file__), 'profanity_words.txt')
-#     try:
-#         with open(file_path, 'r', encoding='utf-8') as file:
-#             profanity_lists = {}
-#             current_language = None
-#             current_words = []
-#             for line in file:
-#                 line = line.strip()
-#                 if line.startswith("$") and line.endswith("$"):
-#                     if current_language:
-#                         profanity_lists[current_language] = current_words
-#                         current_words = []
-#                     current_language = line.strip("$")
-#                 else:
-#                     current_words.append(line)
-#             if current_language:
-#                 profanity_lists[current_language] = current_words
-
-#             if language == 'All':
-#                 all_profanity_words = []
-#                 for words in profanity_lists.values():
-#                     all_profanity_words.extend(words)
-#                 return all_profanity_words
-#             else:
-#                 return profanity_lists.get(language, [])
-#     except FileNotFoundError:
-#         print("Failed to load profanity words file. Using default list.")
-#         return [
-#             'profane_word1',
-#             'profane_word2',
-#             'profane_word3'
-#         ]
-
 def load_profanity_words(language='English'):
     """
     Load profanity words for the specified language.
@@ -2787,7 +2743,7 @@ def load_profanity_words(language='English'):
         return profanity_lists.get(language, [])
 
 
-def detect_profanity(text_data, language='English', allowed_languages=None):
+def detect_profanity(text_data, language='English'):
     """
     Detect profanity in text data using regex.
 
@@ -2852,4 +2808,96 @@ def remove_profanity(text_data, output_file=None, language='English'):
         with open(output_file, 'w', encoding='utf-8') as file:
             file.write('\n'.join(cleaned_data))
 
+    return cleaned_data
+
+# New functions for 1.5
+def detect_sensitive_information(text_data):
+    """
+    Detect sensitive information patterns in the provided text data.
+
+    Args:
+        text_data (list of str): A list of strings representing the text data to be analyzed.
+
+    Returns:
+        list of tuple: A list of tuples containing detected sensitive information, each tuple
+            representing (line number, column index, type, value).
+    """
+    sensitive_info = []
+    
+    # Regular expression for detecting email addresses
+    email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    # Regular expression for detecting phone numbers
+    phone_regex = r'\b(?:\d{3}[-.\s]??\d{3}[-.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-.\s]??\d{4}|\d{3}[-.\s]??\d{4})\b'
+    # Regular expression for detecting credit card numbers (Visa, Mastercard, American Express, Discover)
+    credit_card_regex = r'\b(?:\d[ -]*?){13,16}\b'
+    # Regular expression for detecting social security numbers (SSN)
+    ssn_regex = r'\b\d{3}[-]?\d{2}[-]?\d{4}\b'
+    # Regular expression for detecting ID numbers (e.g., driver's license, passport)
+    id_number_regex = r'\b[A-Za-z]{1,2}\d{6,9}\b'
+    # Regular expression for detecting addresses (simple example)
+    address_regex = r'\b\d+\s\w+\s\w+,\s\w+,\s\w+\b'
+    # Regular expression for detecting IP addresses
+    ip_address_regex = r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'
+    
+    for i, line in enumerate(text_data):
+        # Detect email addresses
+        emails = re.findall(email_regex, line)
+        for email in emails:
+            sensitive_info.append((i + 1, line.find(email), 'Email', email))
+        
+        # Detect phone numbers
+        phones = re.findall(phone_regex, line)
+        for phone in phones:
+            sensitive_info.append((i + 1, line.find(phone), 'Phone', phone))
+        
+        # Detect credit card numbers
+        credit_cards = re.findall(credit_card_regex, line)
+        for card in credit_cards:
+            sensitive_info.append((i + 1, line.find(card), 'Credit Card', card))
+        
+        # Detect social security numbers
+        ssn_numbers = re.findall(ssn_regex, line)
+        for ssn in ssn_numbers:
+            sensitive_info.append((i + 1, line.find(ssn), 'SSN', ssn))
+        
+        # Detect ID numbers
+        id_numbers = re.findall(id_number_regex, line)
+        for id_number in id_numbers:
+            sensitive_info.append((i + 1, line.find(id_number), 'ID Number', id_number))
+        
+        # Detect addresses
+        addresses = re.findall(address_regex, line)
+        for address in addresses:
+            sensitive_info.append((i + 1, line.find(address), 'Address', address))
+        
+        # Detect IP addresses
+        ip_addresses = re.findall(ip_address_regex, line)
+        for ip_address in ip_addresses:
+            sensitive_info.append((i + 1, line.find(ip_address), 'IP Address', ip_address))
+    
+    return sensitive_info
+
+def remove_sensitive_information(text_data, output_file=None):
+    """
+    Remove sensitive information patterns from the provided text data.
+
+    Args:
+        text_data (list of str): A list of strings representing the text data to be cleaned.
+        output_file (str, optional): Path to the output file where cleaned data will be saved.
+
+    Returns:
+        list of str: A list of strings representing the cleaned text data.
+    """
+    sensitive_info = detect_sensitive_information(text_data)
+    cleaned_data = []
+    for line in text_data:
+        cleaned_line = line
+        for _, _, _, info in sensitive_info:
+            cleaned_line = cleaned_line.replace(info, '[SENSITIVE]')
+        cleaned_data.append(cleaned_line)
+
+    # Write cleaned data to output file if provided
+    if output_file:
+        with open(output_file, 'w', encoding='utf-8') as file:
+            file.write('\n'.join(cleaned_data))
     return cleaned_data

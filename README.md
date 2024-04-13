@@ -5,7 +5,7 @@
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
 ![PyPI Version](https://img.shields.io/pypi/v/valx)
 
-An open-source Python library for data cleaning tasks. Includes profanity detection, and removal.
+An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Also now includes personal information detection and removal.
 
 ## Installation
 
@@ -32,6 +32,8 @@ Please ensure that you have one of these Python versions installed before using 
 
 - **Profanity Detection**: Detect profane and NSFW words or terms.
 - **Remove Profanity**: Remove profane and NSFW words or terms.
+- **Detect Sensitive Information**: Detect sensitive information in text data.
+- **Remove Sensitive Information**: Remove sensitive information from text data.
 
 ## Usage
 
@@ -53,13 +55,31 @@ from valx import remove_profanity
 removed = remove_profanity(sample_text, "text_cleaned.txt", language="English")
 ```
 
+### Detect Sensitive Information
+
+```python
+from valx import detect_sensitive_information
+
+# Detect sensitive information
+detected_sensitive_info = detect_sensitive_information(sample_text)
+```
+
+### Remove Sensitive Information
+
+```python
+from valx import remove_sensitive_information
+
+# Remove sensitive information
+cleaned_text = remove_sensitive_information(sample_text2)
+```
+
 ## Contributing
 
 Contributions are welcome! If you encounter any issues, have suggestions, or want to contribute to ValX, please open an issue or submit a pull request on [GitHub](https://github.com/infinitode/valx).
 
 ## License
 
-PyWebScrapr is released under the terms of the **MIT License (Modified)**. Please see the [LICENSE](https://github.com/infinitode/pywebscrapr/blob/main/LICENSE) file for the full text.
+ValX is released under the terms of the **MIT License (Modified)**. Please see the [LICENSE](https://github.com/infinitode/valx/blob/main/LICENSE) file for the full text.
 
 ### Derived licenses
 ---
