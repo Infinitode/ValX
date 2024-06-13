@@ -1,11 +1,11 @@
-# ValX 0.1.7
+# ValX
 ![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
 [![Code Size](https://img.shields.io/github/languages/code-size/infinitode/valx)](https://github.com/infinitode/valx)
 ![Downloads](https://pepy.tech/badge/valx)
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
 ![PyPI Version](https://img.shields.io/pypi/v/valx)
 
-An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Also now includes personal information detection and removal. Now includes hate speech and offensive speech detection using AI.
+An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Also now includes personal information detection and removal. Now includes hate speech and offensive language detection using AI.
 
 ## Installation
 
