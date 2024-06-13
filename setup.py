@@ -12,8 +12,7 @@ setup(
     packages=find_packages(),
     package_data={'valx': ['models/*']},
     install_requires=[
-        'scikit-learn==1.2.2',  # for the AI to function properly
-        'pickle'
+        'scikit-learn==1.2.2'  # for the AI to function properly
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
