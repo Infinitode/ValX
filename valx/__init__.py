@@ -1,6 +1,11 @@
 import os
 import re
 
+# New version, that includes AI detection
+import pickle
+from sklearn.tree import DecisionTreeClassifier  # Import the DecisionTreeClassifier class
+from sklearn.feature_extraction.text import CountVectorizer  # Import the CountVectorizer class
+
 '''
 ValX uses data from this GitHub repository:
 https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/
@@ -2901,3 +2906,29 @@ def remove_sensitive_information(text_data, output_file=None):
         with open(output_file, 'w', encoding='utf-8') as file:
             file.write('\n'.join(cleaned_data))
     return cleaned_data
+
+
+# New version
+MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
+DECISION_TREE_MODEL_PATH = os.path.join(MODEL_DIR, 'decision_tree_model.sav')
+COUNT_VECTORIZER_PATH = os.path.join(MODEL_DIR, 'count_vectorizer.sav')
+
+# Load the saved models
+model = pickle.load(open(DECISION_TREE_MODEL_PATH, 'rb'))
+cv = pickle.load(open(COUNT_VECTORIZER_PATH, 'rb'))
+
+def detect_hate_speech(text):
+    """
+    Detect offensive language or hate speech in the provided text string, using an AI model.
+
+    Args:
+        text (str): A string representing the text data to be used for hate speech detection and offensive language detection.
+
+    Returns:
+        list of str: A list of strings representing the outcome of the detection.
+    """
+    # if isinstance(text, str):
+    #     text = [text]
+
+    text = cv.transform([text]).toarray()
+    return model.predict((text))

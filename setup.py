@@ -6,10 +6,15 @@ setup(
     author='Infinitode Pty Ltd',
     author_email='infinitode.ltd@gmail.com',
     description='An open-source Python library for text cleaning tasks.',
-    long_description='An open-source Python library for data cleaning tasks. Includes profanity detection, and removal.',
+    long_description='An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Now includes offensive and hate speech detection using an AI model.',
     long_description_content_type='text/markdown',
     url='https://github.com/infinitode/valx',
     packages=find_packages(),
+    package_data={'valx': ['models/*']},
+    install_requires=[
+        'scikit-learn==1.2.2',  # for the AI to function properly
+        'pickle'
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

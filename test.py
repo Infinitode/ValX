@@ -1,4 +1,4 @@
-from valx import load_profanity_words, detect_profanity, remove_profanity, detect_sensitive_information, remove_sensitive_information
+from valx import load_profanity_words, detect_profanity, remove_profanity, detect_sensitive_information, remove_sensitive_information, detect_hate_speech
 
 def main():
     sample_text = [
@@ -14,6 +14,8 @@ def main():
 
     removed = remove_profanity(sample_text, "text_cleaned.txt", language="All")
 
+    # New version
+    print(detect_hate_speech("You're so stupid."))
 
     # Example usage:
     sample_text2 = [

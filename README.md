@@ -1,11 +1,11 @@
-# ValX
+# ValX 0.1.7
 ![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
 [![Code Size](https://img.shields.io/github/languages/code-size/infinitode/valx)](https://github.com/infinitode/valx)
 ![Downloads](https://pepy.tech/badge/valx)
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
 ![PyPI Version](https://img.shields.io/pypi/v/valx)
 
-An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Also now includes personal information detection and removal.
+An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Also now includes personal information detection and removal. Now includes hate speech and offensive speech detection using AI.
 
 ## Installation
 
@@ -34,6 +34,7 @@ Please ensure that you have one of these Python versions installed before using 
 - **Remove Profanity**: Remove profane and NSFW words or terms.
 - **Detect Sensitive Information**: Detect sensitive information in text data.
 - **Remove Sensitive Information**: Remove sensitive information from text data.
+- **Detect Hate Speech**: Detect hate speech or offensive speech in text, using AI.
 
 ## Usage
 
@@ -71,6 +72,15 @@ from valx import remove_sensitive_information
 
 # Remove sensitive information
 cleaned_text = remove_sensitive_information(sample_text2)
+```
+
+### Detect Hate Speech And Offensive Language
+
+```python
+from valx import detect_hate_speech
+
+# Detect hate speech or offensive language
+outcome_of_detection = detect_hate_speech("You are stupid.")
 ```
 
 ## Contributing
