@@ -7,6 +7,10 @@
 
 An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Also now includes personal information detection and removal. Now includes hate speech and offensive language detection using AI.
 
+## Changes in 0.2.0
+
+Using the AI models in ValX, you can now automatically remove hate speech, or offensive speech from your text data, without needing to run detection and write your own custom implementation method.
+
 ## Installation
 
 You can install ValX using pip:
@@ -35,6 +39,7 @@ Please ensure that you have one of these Python versions installed before using 
 - **Detect Sensitive Information**: Detect sensitive information in text data.
 - **Remove Sensitive Information**: Remove sensitive information from text data.
 - **Detect Hate Speech**: Detect hate speech or offensive speech in text, using AI.
+- **Remove Hate Speech**: Remove hate speech or offensive speech in text, using AI.
 
 ## Usage
 
@@ -82,6 +87,8 @@ from valx import detect_hate_speech
 # Detect hate speech or offensive language
 outcome_of_detection = detect_hate_speech("You are stupid.")
 ```
+
+*See our [official documentation](https://infinitode-docs.gitbook.io/documentation/package-documentation/valx-package-documentation) for more examples on how to use ValX.*
 
 ## Contributing
 
