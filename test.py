@@ -1,4 +1,4 @@
-from valx import load_profanity_words, detect_profanity, remove_profanity, detect_sensitive_information, remove_sensitive_information, detect_hate_speech
+from valx import load_profanity_words, detect_profanity, remove_profanity, detect_sensitive_information, remove_sensitive_information, detect_hate_speech, remove_hate_speech
 
 def main():
     sample_text = [
@@ -36,6 +36,11 @@ def main():
     cleaned_text = remove_sensitive_information(sample_text2)
     print("\nCleaned text:")
     for line in cleaned_text:
+        print(line)
+
+    cleaned_text_ai = remove_hate_speech(sample_text)
+    print("Cleaned text using AI:")
+    for line in cleaned_text_ai:
         print(line)
     
 if __name__ == "__main__":

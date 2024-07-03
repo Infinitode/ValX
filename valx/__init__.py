@@ -2922,7 +2922,7 @@ def detect_hate_speech(text):
     Detect offensive language or hate speech in the provided text string, using an AI model.
 
     Args:
-        text (str): A string representing the text data to be used for hate speech detection and offensive language detection.
+        text_data (list of str): A list of strings representing the text data to be cleaned.
 
     Returns:
         list of str: A list of strings representing the outcome of the detection.
@@ -2932,3 +2932,21 @@ def detect_hate_speech(text):
 
     text = cv.transform([text]).toarray()
     return model.predict((text))
+
+def remove_hate_speech(text_data):
+    """
+    Remove offensive language or hate speech in the provided text data array, using an AI model.
+
+    Args:
+        text (str): A string representing the text data to be used for hate speech detection and offensive language detection.
+
+    Returns:
+        list of str: A list of strings representing the cleaned text data.
+    """
+    cleaned_data = []
+    for sentence in text_data:
+        outcome = detect_hate_speech(sentence)
+        if outcome != ['Hate Speech'] and outcome != ['Offensive Speech'] and outcome == ['No Hate and Offensive Speech']:
+            cleaned_data.append(sentence)
+    
+    return cleaned_data
