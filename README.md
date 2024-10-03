@@ -92,6 +92,12 @@ from valx import detect_hate_speech
 outcome_of_detection = detect_hate_speech("You are stupid.")
 ```
 
+> [!IMPORTANT]
+> The model's possible outputs are:
+> - `['Hate Speech']`: The text was flagged and contained hate speech.
+> - `['Offensive Speech']`: The text was flagged and contained offensive speech.
+> - `['No Hate and Offensive Speech']`: The text was not flagged for any hate speech or offensive speech.
+
 > [!NOTE]
 > See our [official documentation](https://infinitode-docs.gitbook.io/documentation/package-documentation/valx-package-documentation) for more examples on how to use **ValX**.
 
