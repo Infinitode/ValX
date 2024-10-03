@@ -5,7 +5,11 @@
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
 ![PyPI Version](https://img.shields.io/pypi/v/valx)
 
-An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Also now includes personal information detection and removal. Now includes hate speech and offensive language detection using AI.
+An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. It also now provides detection and removal of personal information. Now includes hate speech and offensive language detection using AI.
+
+> [!IMPORTANT]
+> Please downgrade to `numpy` version `1.26.4`. Our ValX **DecisionTreeClassifier** AI model, relies on lower versions of `numpy`, because it was trained on these versions.
+> For more information see: https://techoverflow.net/2024/07/23/how-to-fix-numpy-dtype-size-changed-may-indicate-binary-incompatibility-expected-96-from-c-header-got-88-from-pyobject/
 
 ## Changes in 0.2.1
 
@@ -88,7 +92,8 @@ from valx import detect_hate_speech
 outcome_of_detection = detect_hate_speech("You are stupid.")
 ```
 
-> See our [official documentation](https://infinitode-docs.gitbook.io/documentation/package-documentation/valx-package-documentation) for more examples on how to use ValX.*
+> [!NOTE]
+> See our [official documentation](https://infinitode-docs.gitbook.io/documentation/package-documentation/valx-package-documentation) for more examples on how to use **ValX**.
 
 ## Contributing
 
