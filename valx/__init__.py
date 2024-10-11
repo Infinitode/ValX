@@ -2754,11 +2754,14 @@ def detect_profanity(text_data, language='English'):
 
     Args:
         text_data (list): A list of strings representing the text data to analyze.
-        language (str): The language for which to detect profanity. Defaults to 'English'.
-        allowed_languages (list): A list of languages to allow for detection. If provided, only profanity words for these languages will be considered.
-
+        language (str): The language used to detect profanity. Defaults to 'English'. Available languages include: All, Arabic, Czech, Danish, German, English, Esperanto, Persian, Finnish, Filipino, French, French (CA), Hindi, Hungarian, Italian, Japanese, Kabyle, Korean, Dutch, Norwegian, Polish, Portuguese, Russian, Swedish, Thai, Klingon, Turkish, Chinese.
     Returns:
-        int: The total number of profanity detections.
+        list: A list of dictionaries where each dictionary represents a detected instance of profanity.
+            Each dictionary contains the following keys:
+            - "Line" (int): The line number where the profanity was detected.
+            - "Column" (int): The column number (position in the line) where the profanity starts.
+            - "Word" (str): The detected profanity word.
+            - "Language" (str): The language in which the profanity was detected.
     """
     profanity_keywords = load_profanity_words(language)
     detected = set()  # Use a set to store unique occurrences
@@ -2774,12 +2777,19 @@ def detect_profanity(text_data, language='English'):
             for match in matches:
                 detected.add((i + 1, match.start() + 1, language, profanity))  # Add to set
 
-    if detected:
-        print(f"Profanity detected:")
-        for line_num, col_num, lang, word in detected:
-            print(f"Language: {lang}, Line {line_num}, Column {col_num}: '{word}'")
+    detections = []  # Initialize detections as a list
 
-    return len(detected)
+    if detected:
+        for line_num, col_num, lang, word in detected:
+            detection_info = {
+                "Line": line_num,
+                "Column": col_num,
+                "Word": word,
+                "Language": lang
+            }
+            detections.append(detection_info)  # Append each detection to the list
+
+    return detections
 
 
 def remove_profanity(text_data, output_file=None, language='English'):
@@ -2927,9 +2937,6 @@ def detect_hate_speech(text):
     Returns:
         list of str: A list of strings representing the outcome of the detection.
     """
-    # if isinstance(text, str):
-    #     text = [text]
-
     text = cv.transform([text]).toarray()
     return model.predict((text))
 

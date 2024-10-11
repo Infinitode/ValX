@@ -1,4 +1,4 @@
-from valx import load_profanity_words, detect_profanity, remove_profanity, detect_sensitive_information, remove_sensitive_information, detect_hate_speech, remove_hate_speech
+from valx import detect_profanity, remove_profanity, detect_sensitive_information, remove_sensitive_information, detect_hate_speech, remove_hate_speech
 
 def main():
     sample_text = [
@@ -8,9 +8,11 @@ def main():
     ]
 
     # Detect profanity
-    num_profanities = detect_profanity(sample_text, language='All')
+    detected_profanity = detect_profanity(sample_text, language='All')
+    print(detected_profanity)
 
-    print(f"Number of profanities detected: {num_profanities}")
+    # Print out all detected words
+    print([d['Word'] for d in detected_profanity])
 
     removed = remove_profanity(sample_text, "text_cleaned.txt", language="All")
 

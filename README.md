@@ -7,6 +7,15 @@
 
 An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. Also now includes personal information detection and removal. Now includes hate speech and offensive language detection using AI.
 
+## Changes in 0.2.2
+
+We have refactored and changed the `detect_profanity` function:
+- Removed unnecessary printing
+- Now returns more information about each found profanity, including `Line`, `Column`, `Word`, and `Language`.
+
+> [!NOTE]
+> You can view [ValX's package documentation](https://infinitode-docs.gitbook.io/documentation/package-documentation/valx-package-documentation) for more information on changes.
+
 ## Changes in 0.2.1
 
 Using the AI models in ValX, you can now automatically remove hate speech, or offensive speech from your text data, without needing to run detection and write your own custom implementation method.
@@ -41,6 +50,38 @@ Please ensure that you have one of these Python versions installed before using 
 - **Detect Hate Speech**: Detect hate speech or offensive speech in text, using AI.
 - **Remove Hate Speech**: Remove hate speech or offensive speech in text, using AI.
 
+### List of supported languages for profanity detection and removal
+Below is a complete list of all the available supported languages for ValX's profanity detection and removal functions which are valid values for `language`:
+
+- **All**
+- Arabic
+- Czech
+- Danish
+- German
+- English
+- Esperanto
+- Persian
+- Finnish
+- Filipino
+- French
+- French (CA)
+- Hindi
+- Hungarian
+- Italian
+- Japanese
+- Kabyle
+- Korean
+- Dutch
+- Norwegian
+- Polish
+- Portuguese
+- Russian
+- Swedish
+- Thai
+- Klingon
+- Turkish
+- Chinese
+
 ## Usage
 
 ### Detect Profanity
@@ -49,7 +90,8 @@ Please ensure that you have one of these Python versions installed before using 
 from valx import detect_profanity
 
 # Detect profanity
-num_profanities = detect_profanity(sample_text, language='English')
+results = detect_profanity(sample_text, language='English')
+print("Profanity Evaluation Results", results)
 ```
 
 ### Remove Profanity
