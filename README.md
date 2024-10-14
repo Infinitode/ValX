@@ -5,7 +5,7 @@
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
 ![PyPI Version](https://img.shields.io/pypi/v/valx)
 
-An open-source Python library for data cleaning tasks. Includes profanity detection, and removal. It also now provides detection and removal of personal information. Now includes hate speech and offensive language detection using AI.
+An open-source Python library for data cleaning tasks. It includes functions for profanity detection, and removal, and detection and removal of personal information. Also includes hate speech and offensive language detection and removal, using AI.
 
 > [!IMPORTANT]
 > Please downgrade to `numpy` version `1.26.4`. Our ValX **DecisionTreeClassifier** AI model, relies on lower versions of `numpy`, because it was trained on these versions.
