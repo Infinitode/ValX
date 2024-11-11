@@ -2825,85 +2825,68 @@ def remove_profanity(text_data, output_file=None, language='English'):
 
     return cleaned_data
 
-# New functions for 1.5
-def detect_sensitive_information(text_data):
+def detect_sensitive_information(text_data, info_type=["email", "phone", "credit_card", "ssn", "id", "address", "ip", "iban", "mrn", "icd10", "geo_coords", "username", "file_path", "bitcoin_wallet", "ethereum_wallet"]):
     """
     Detect sensitive information patterns in the provided text data.
 
     Args:
         text_data (list of str): A list of strings representing the text data to be analyzed.
+        info_type (str or list of str, optional): One or more types of sensitive info to detect. Available types are: "email", "phone", "credit_card", "ssn", "id", "address", "ip", "iban", "mrn", "icd10", "geo_coords", "username", "file_path", "bitcoin_wallet", "ethereum_wallet". Uses all info types by default.
 
     Returns:
         list of tuple: A list of tuples containing detected sensitive information, each tuple
             representing (line number, column index, type, value).
     """
+    if isinstance(info_type, str):
+        info_type = [info_type]  # Convert single string to list for consistent handling
+
+    # Dictionary to map info_type to regex patterns
+    regex_patterns = {
+        "email": r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+        "phone": r'\b(?:\d{3}[-.\s]??\d{3}[-.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-.\s]??\d{4}|\d{3}[-.\s]??\d{4})\b',
+        "credit_card": r'\b(?:\d[ -]*?){13,16}\b',
+        "ssn": r'\b\d{3}[-]?\d{2}[-]?\d{4}\b',
+        "id": r'\b[A-Za-z]{1,2}\d{6,9}\b',
+        "address": r'\b\d+\s\w+\s\w+,\s\w+,\s\w+\b',
+        "ip": r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b',
+        "iban": r'\b[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}\b',
+        "mrn": r'\b\d{5,10}\b',
+        "icd10": r'\b[A-TV-Z][0-9]{2}(?:\.[0-9A-TV-Z]{1,4})?\b',
+        "geo_coords": r'\b[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)\b',
+        "username": r'@\w+',
+        "file_path": r'([A-Za-z]:\\|/)?([-\w\s]+\\|/)*[-\w\s]+\.\w+',
+        "bitcoin_wallet": r'\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b',
+        "ethereum_wallet": r'\b0x[a-fA-F0-9]{40}\b'
+    }
+
     sensitive_info = []
     
-    # Regular expression for detecting email addresses
-    email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-    # Regular expression for detecting phone numbers
-    phone_regex = r'\b(?:\d{3}[-.\s]??\d{3}[-.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-.\s]??\d{4}|\d{3}[-.\s]??\d{4})\b'
-    # Regular expression for detecting credit card numbers (Visa, Mastercard, American Express, Discover)
-    credit_card_regex = r'\b(?:\d[ -]*?){13,16}\b'
-    # Regular expression for detecting social security numbers (SSN)
-    ssn_regex = r'\b\d{3}[-]?\d{2}[-]?\d{4}\b'
-    # Regular expression for detecting ID numbers (e.g., driver's license, passport)
-    id_number_regex = r'\b[A-Za-z]{1,2}\d{6,9}\b'
-    # Regular expression for detecting addresses (simple example)
-    address_regex = r'\b\d+\s\w+\s\w+,\s\w+,\s\w+\b'
-    # Regular expression for detecting IP addresses
-    ip_address_regex = r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'
-    
+    # Loop through each line and check for sensitive info types based on specified `info_type`
     for i, line in enumerate(text_data):
-        # Detect email addresses
-        emails = re.findall(email_regex, line)
-        for email in emails:
-            sensitive_info.append((i + 1, line.find(email), 'Email', email))
-        
-        # Detect phone numbers
-        phones = re.findall(phone_regex, line)
-        for phone in phones:
-            sensitive_info.append((i + 1, line.find(phone), 'Phone', phone))
-        
-        # Detect credit card numbers
-        credit_cards = re.findall(credit_card_regex, line)
-        for card in credit_cards:
-            sensitive_info.append((i + 1, line.find(card), 'Credit Card', card))
-        
-        # Detect social security numbers
-        ssn_numbers = re.findall(ssn_regex, line)
-        for ssn in ssn_numbers:
-            sensitive_info.append((i + 1, line.find(ssn), 'SSN', ssn))
-        
-        # Detect ID numbers
-        id_numbers = re.findall(id_number_regex, line)
-        for id_number in id_numbers:
-            sensitive_info.append((i + 1, line.find(id_number), 'ID Number', id_number))
-        
-        # Detect addresses
-        addresses = re.findall(address_regex, line)
-        for address in addresses:
-            sensitive_info.append((i + 1, line.find(address), 'Address', address))
-        
-        # Detect IP addresses
-        ip_addresses = re.findall(ip_address_regex, line)
-        for ip_address in ip_addresses:
-            sensitive_info.append((i + 1, line.find(ip_address), 'IP Address', ip_address))
-    
+        for type_ in info_type:
+            pattern = regex_patterns.get(type_)
+            if pattern:
+                matches = re.finditer(pattern, line)
+                for match in matches:
+                    sensitive_info.append((i + 1, match.start(), type_.capitalize(), match.group()))
+
     return sensitive_info
 
-def remove_sensitive_information(text_data, output_file=None):
+def remove_sensitive_information(text_data, output_file=None, info_type=["email", "phone", "credit_card", "ssn", "id", "address", "ip", "iban", "mrn", "icd10", "geo_coords", "username", "file_path", "bitcoin_wallet", "ethereum_wallet"]):
     """
     Remove sensitive information patterns from the provided text data.
 
     Args:
         text_data (list of str): A list of strings representing the text data to be cleaned.
         output_file (str, optional): Path to the output file where cleaned data will be saved.
+        info_type (str or list of str, optional): One or more types of sensitive info to detect and remove. Available types are: "email", "phone", "credit_card", "ssn", "id", "address", "ip", "iban", "mrn", "icd10", "geo_coords", "username", "file_path", "bitcoin_wallet", "ethereum_wallet". Uses all info types by default.
 
     Returns:
         list of str: A list of strings representing the cleaned text data.
     """
-    sensitive_info = detect_sensitive_information(text_data)
+    # Detect sensitive information
+    sensitive_info = detect_sensitive_information(text_data, info_type=info_type)
+
     cleaned_data = []
     for line in text_data:
         cleaned_line = line
@@ -2916,7 +2899,6 @@ def remove_sensitive_information(text_data, output_file=None):
         with open(output_file, 'w', encoding='utf-8') as file:
             file.write('\n'.join(cleaned_data))
     return cleaned_data
-
 
 # New version
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')

@@ -11,6 +11,20 @@ An open-source Python library for data cleaning tasks. Includes profanity detect
 > Please downgrade to `numpy` version `1.26.4`. Our ValX **DecisionTreeClassifier** AI model, relies on lower versions of `numpy`, because it was trained on these versions.
 > For more information see: https://techoverflow.net/2024/07/23/how-to-fix-numpy-dtype-size-changed-may-indicate-binary-incompatibility-expected-96-from-c-header-got-88-from-pyobject/
 
+## Changes in 0.2.3
+
+We have introduced a new optional `info_type` parameter into our `detect_sensitive_information`, and `remove_sensitive_information` functions, to allow you to have fine-grained control over what sensitive information you want to detect or remove.
+
+Also introduced more detection patterns for other types of sensitive information, including:
+- `"iban"`: International Bank Account Number.
+- `"mrn"`: Medical Record Number (may not work correctly, depending on provider and country).
+- `"icd10"`: International Classification of Diseases, Tenth Revision.
+- `"geo_coords"`: Geo-coordinates (latitude and longitude in decimal degrees format).
+- `"username"`: Username handles (@username).
+- `"file_path"`: File paths (general patterns for both Windows and Unix paths).
+- `"bitcoin_wallet"`: Cryptocurrency wallet address.
+- `"ethereum_wallet"`: Cryptocurrency wallet addresses.
+
 ## Changes in 0.2.2
 
 We have refactored and changed the `detect_profanity` function:
@@ -115,6 +129,9 @@ from valx import detect_sensitive_information
 # Detect sensitive information
 detected_sensitive_info = detect_sensitive_information(sample_text)
 ```
+
+> [!NOTE]
+> We have updated this function, and it now includes an optional argument for `info_type`, which can be used to detect only specific types of sensitive information. It was also added to `remove_sensitive_information`.
 
 ### Remove Sensitive Information
 
