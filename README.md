@@ -8,8 +8,13 @@
 An open-source Python library for data cleaning tasks. It includes functions for profanity detection, and removal, and detection and removal of personal information. Also includes hate speech and offensive language detection and removal, using AI.
 
 > [!IMPORTANT]
+> If you are using `scikit-learn` versions older than version `1.3.0`, please also downgrade your version of `numpy` as stated below. Otherwise, you can continue to use your preferred version of `scikit-learn` without downgrading `numpy`.
+>
 > Please downgrade to `numpy` version `1.26.4`. Our ValX **DecisionTreeClassifier** AI model, relies on lower versions of `numpy`, because it was trained on these versions.
 > For more information see: https://techoverflow.net/2024/07/23/how-to-fix-numpy-dtype-size-changed-may-indicate-binary-incompatibility-expected-96-from-c-header-got-88-from-pyobject/
+
+> [!NOTE]
+> ValX will automatically install a version of `scikit-learn` that is compatible with your device if you don't have one already.
 
 ## Changes in 0.2.4
 
