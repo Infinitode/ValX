@@ -3,6 +3,7 @@ import re
 
 # New version, that includes AI detection
 import pickle
+from sklearn import __version__ as sklearnversion
 from sklearn.tree import DecisionTreeClassifier  # Import the DecisionTreeClassifier class
 from sklearn.feature_extraction.text import CountVectorizer  # Import the CountVectorizer class
 
@@ -2902,8 +2903,18 @@ def remove_sensitive_information(text_data, output_file=None, info_type=["email"
 
 # New version
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
-DECISION_TREE_MODEL_PATH = os.path.join(MODEL_DIR, 'decision_tree_model.sav')
 COUNT_VECTORIZER_PATH = os.path.join(MODEL_DIR, 'count_vectorizer.sav')
+DEFAULT_MODEL_FILENAME = "decision_tree_model.sav"
+UPGRADED_MODEL_FILENAME = "classifier_upgraded.pkl"
+
+# Check scikit-learn version
+SKLEARN_VERSION = tuple(map(int, sklearnversion.split(".")))
+
+# Set the model path based on the version
+if SKLEARN_VERSION >= (1, 3, 0):
+    DECISION_TREE_MODEL_PATH = os.path.join(MODEL_DIR, UPGRADED_MODEL_FILENAME)
+else:
+    DECISION_TREE_MODEL_PATH = os.path.join(MODEL_DIR, DEFAULT_MODEL_FILENAME)
 
 # Load the saved models
 model = pickle.load(open(DECISION_TREE_MODEL_PATH, 'rb'))

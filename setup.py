@@ -15,10 +15,10 @@ setup(
     packages=find_packages(),
     package_data={'valx': ['models/*']},
     install_requires=[
-        'scikit-learn==1.2.2'  # for the AI to function properly
+        'scikit-learn'
     ],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.6',

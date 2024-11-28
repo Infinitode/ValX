@@ -11,6 +11,12 @@ An open-source Python library for data cleaning tasks. It includes functions for
 > Please downgrade to `numpy` version `1.26.4`. Our ValX **DecisionTreeClassifier** AI model, relies on lower versions of `numpy`, because it was trained on these versions.
 > For more information see: https://techoverflow.net/2024/07/23/how-to-fix-numpy-dtype-size-changed-may-indicate-binary-incompatibility-expected-96-from-c-header-got-88-from-pyobject/
 
+## Changes in 0.2.4
+
+Fixed a major incompatibility issue with `scikit-learn` due to version changes in `scikit-learn v1.3.0` which causes compatibility issues with versions later than `1.2.2`. ValX can now be used with `scikit-learn` versions earlier and later than `1.3.0`!
+
+We've also removed `scikit-learn==1.2.2` as a dependency, as most versions of `scikit-learn` will now work.
+
 ## Changes in 0.2.3
 
 We have introduced a new optional `info_type` parameter into our `detect_sensitive_information`, and `remove_sensitive_information` functions, to allow you to have fine-grained control over what sensitive information you want to detect or remove.

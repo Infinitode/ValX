@@ -14,7 +14,7 @@ def main():
     # Print out all detected words
     print([d['Word'] for d in detected_profanity])
 
-    removed = remove_profanity(sample_text, "text_cleaned.txt", language="All")
+    remove_profanity(sample_text, "text_cleaned.txt", language="All")
 
     # New version
     print(detect_hate_speech("You're so stupid."))
