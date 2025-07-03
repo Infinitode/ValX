@@ -16,15 +16,20 @@ Creative Commons Attribution 4.0 International License:
 https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/LICENSE
 '''
 
-def load_profanity_words(language='English'):
+def load_profanity_words(language='English', custom_words_list: list[str] = None):
     """
-    Load profanity words for the specified language.
+    Load profanity words for the specified language, optionally including a custom list.
 
     Args:
-        language (str): The language for which to load profanity words. Defaults to 'English'.
+        language (str, optional): The language for which to load profanity words.
+                                  Defaults to 'English'. Can be None to use only custom_words_list.
+        custom_words_list (list[str], optional): A list of custom profanity words. Defaults to None.
 
     Returns:
-        list: A list of profanity words for the specified language, or all languages if 'All' is specified.
+        list: A list of profanity words.
+
+    Raises:
+        ValueError: If language is None and custom_words_list is None or empty.
     """
     # Profanity words as a string
     PROFANITY_WORDS = """
@@ -2740,35 +2745,102 @@ def load_profanity_words(language='English'):
     if current_language:
         profanity_lists[current_language] = current_words
 
-    if language == 'All':
-        all_profanity_words = []
+    loaded_words = []
+    if language is None:
+        if not custom_words_list:
+            raise ValueError("If language is None, custom_words_list must be provided and non-empty.")
+        loaded_words = list(custom_words_list) # Use a copy
+    elif language == 'All':
         for words in profanity_lists.values():
-            all_profanity_words.extend(words)
-        return all_profanity_words
+            loaded_words.extend(words)
+        if custom_words_list:
+            loaded_words.extend(w for w in custom_words_list if w not in loaded_words)
     else:
-        return profanity_lists.get(language, [])
+        loaded_words = list(profanity_lists.get(language, [])) # Use a copy
+        if custom_words_list:
+            loaded_words.extend(w for w in custom_words_list if w not in loaded_words)
+
+    return list(set(loaded_words)) # Return unique words
 
 
-def detect_profanity(text_data, language='English'):
+def load_custom_profanity_from_file(filepath: str) -> list[str]:
+    """
+    Loads a custom list of profanity words from a file.
+
+    The file should contain one word per line. Lines starting with '#' will be ignored as comments.
+    Empty lines or lines with only whitespace will also be ignored.
+
+    Args:
+        filepath (str): The path to the file containing custom profanity words.
+
+    Returns:
+        list[str]: A list of words loaded from the file.
+
+    Raises:
+        FileNotFoundError: If the specified filepath does not exist.
+        IOError: For other file reading issues.
+    """
+    custom_words = []
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            for line in f:
+                word = line.strip()
+                if word and not word.startswith('#'):
+                    custom_words.append(word)
+    except FileNotFoundError:
+        # Re-raise FileNotFoundError to be explicit, or handle as per specific project policy
+        # For example, could log a warning and return empty list:
+        # print(f"Warning: File not found at {filepath}. Returning empty custom word list.")
+        # return []
+        raise
+    except IOError as e:
+        # Handle other IO errors, perhaps log them or raise a more generic error
+        # print(f"Warning: Error reading file {filepath}: {e}. Returning empty custom word list.")
+        # return []
+        raise IOError(f"Error reading custom profanity file {filepath}: {e}")
+    return custom_words
+
+
+def detect_profanity(text_data, language='English', custom_words_list: list[str] = None):
     """
     Detect profanity in text data using regex.
 
     Args:
         text_data (list): A list of strings representing the text data to analyze.
-        language (str): The language used to detect profanity. Defaults to 'English'. Available languages include: All, Arabic, Czech, Danish, German, English, Esperanto, Persian, Finnish, Filipino, French, French (CA), Hindi, Hungarian, Italian, Japanese, Kabyle, Korean, Dutch, Norwegian, Polish, Portuguese, Russian, Swedish, Thai, Klingon, Turkish, Chinese.
+        language (str, optional): The language used to detect profanity. Defaults to 'English'.
+                                  Can be None if custom_words_list is provided.
+                                  Available languages include: All, Arabic, Czech, Danish, German,
+                                  English, Esperanto, Persian, Finnish, Filipino, French,
+                                  French (CA), Hindi, Hungarian, Italian, Japanese, Kabyle,
+                                  Korean, Dutch, Norwegian, Polish, Portuguese, Russian,
+                                  Swedish, Thai, Klingon, Turkish, Chinese.
+        custom_words_list (list[str], optional): A list of custom profanity words. Defaults to None.
     Returns:
         list: A list of dictionaries where each dictionary represents a detected instance of profanity.
             Each dictionary contains the following keys:
             - "Line" (int): The line number where the profanity was detected.
             - "Column" (int): The column number (position in the line) where the profanity starts.
             - "Word" (str): The detected profanity word.
-            - "Language" (str): The language in which the profanity was detected.
+            - "Language" (str): The language string indicating the source of the profanity list.
     """
-    profanity_keywords = load_profanity_words(language)
+    profanity_keywords = load_profanity_words(language, custom_words_list)
     detected = set()  # Use a set to store unique occurrences
 
+    display_language = "Custom"
+    if language:
+        if custom_words_list:
+            display_language = f"Custom + {language}"
+        else:
+            display_language = language
+    elif not custom_words_list:
+        # This case should ideally be prevented by load_profanity_words raising an error,
+        # but as a fallback, if somehow load_profanity_words returns empty and language is None
+        # and no custom_words_list, we avoid error here.
+        return []
+
+
     for i, line in enumerate(text_data):
-        # Skip lines with language markers
+        # Skip lines with language markers (though less relevant if custom lists are primary)
         if line.startswith("$") and line.endswith("$"):
             continue
 
@@ -2776,36 +2848,39 @@ def detect_profanity(text_data, language='English'):
         for profanity in profanity_keywords:
             matches = re.finditer(r'\b{}\b'.format(re.escape(profanity)), line, flags=re.IGNORECASE)
             for match in matches:
-                detected.add((i + 1, match.start() + 1, language, profanity))  # Add to set
+                # Store with display_language, not the input `language` parameter
+                detected.add((i + 1, match.start() + 1, display_language, profanity))
 
     detections = []  # Initialize detections as a list
 
     if detected:
-        for line_num, col_num, lang, word in detected:
+        for line_num, col_num, lang_display_name, word in detected:
             detection_info = {
                 "Line": line_num,
                 "Column": col_num,
                 "Word": word,
-                "Language": lang
+                "Language": lang_display_name
             }
-            detections.append(detection_info)  # Append each detection to the list
+            detections.append(detection_info)
 
     return detections
 
 
-def remove_profanity(text_data, output_file=None, language='English'):
+def remove_profanity(text_data, output_file=None, language='English', custom_words_list: list[str] = None):
     """
     Remove profanity from text data.
 
     Args:
         text_data (list): A list of strings representing the text data to clean.
-        output_file (str): The file path to write the cleaned data. If None, cleaned data is not written to a file.
-        language (str): The language for which to remove profanity. Defaults to 'English'.
+        output_file (str, optional): The file path to write the cleaned data. If None, cleaned data is not written to a file.
+        language (str, optional): The language for which to remove profanity. Defaults to 'English'.
+                                  Can be None if custom_words_list is provided.
+        custom_words_list (list[str], optional): A list of custom profanity words. Defaults to None.
 
     Returns:
         list: A list of strings representing the cleaned text data.
     """
-    profanity_keywords = load_profanity_words(language)
+    profanity_keywords = load_profanity_words(language, custom_words_list)
     cleaned_data = []
 
     for line in text_data:
