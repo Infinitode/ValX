@@ -16,6 +16,21 @@ An open-source Python library for data cleaning tasks. It includes functions for
 > [!NOTE]
 > ValX will automatically install a version of `scikit-learn` that is compatible with your device if you don't have one already.
 
+## Changes in 0.2.5
+
+ValX v0.2.5 introduces enhanced flexibility for profanity filtering by adding support for custom profanity lists:
+
+-   **Custom Profanity Word Lists**: Users can now provide their own lists of profane words directly as Python lists to the `detect_profanity` and `remove_profanity` functions via the new `custom_words_list` parameter.
+-   **Standalone Custom Lists**: Utilize your custom profanity list exclusively by setting the `language` parameter to `None`. ValX will then only use the words provided in `custom_words_list`.
+-   **Combined Lists**: Use a custom list in conjunction with ValX's built-in language-specific wordlists. Simply provide both a `language` (e.g., "English") and your `custom_words_list`. ValX will use the combined set of words.
+-   **Loading Custom Lists from File**: A new helper function, `load_custom_profanity_from_file(filepath)`, allows you to easily load custom profanity words from a text file.
+    -   **File Format**: The file should contain one profanity word per line.
+    -   Lines starting with a hash symbol (`#`) are treated as comments and ignored.
+    -   Empty lines or lines containing only whitespace are also ignored.
+-   **Updated Detection Reporting**: The `detect_profanity` function's output now specifies the source of detected profanity more clearly (e.g., "Custom", "Custom + English").
+
+These features give users greater control over the profanity filtering process, allowing for more tailored and specific use cases.
+
 ## Changes in 0.2.4
 
 Fixed a major incompatibility issue with `scikit-learn` due to version changes in `scikit-learn v1.3.0` which causes compatibility issues with versions later than `1.2.2`. ValX can now be used with `scikit-learn` versions earlier and later than `1.3.0`!
@@ -113,24 +128,128 @@ Below is a complete list of all the available supported languages for ValX's pro
 
 ## Usage
 
-### Detect Profanity
+### Profanity Detection and Removal
+
+ValX allows for flexible profanity filtering using built-in language lists, custom word lists (provided as Python lists or loaded from files), or a combination of both.
+
+**1. Basic Profanity Detection (Built-in Language)**
 
 ```python
 from valx import detect_profanity
 
-# Detect profanity
+sample_text = ["This is some fuck and porn text."]
+# Detect profanity using the English list
 results = detect_profanity(sample_text, language='English')
-print("Profanity Evaluation Results", results)
+# results will be:
+# [
+#   {'Line': 1, 'Column': 14, 'Word': 'fuck', 'Language': 'English'},
+#   {'Line': 1, 'Column': 23, 'Word': 'porn', 'Language': 'English'}
+# ]
+print(results)
 ```
 
-### Remove Profanity
+**2. Profanity Detection with a Custom Word List (Python List)**
+
+You can provide your own list of words to filter.
 
 ```python
-from valx import remove_profanity
+from valx import detect_profanity
 
-# Remove profanity
-removed = remove_profanity(sample_text, "text_cleaned.txt", language="English")
+sample_text = ["This contains custombadword1 and also asshole from English list."]
+my_custom_words = ["custombadword1", "anothercustom"]
+
+# Option A: Custom list ONLY (language=None)
+results_custom_only = detect_profanity(sample_text, language=None, custom_words_list=my_custom_words)
+# results_custom_only will detect "custombadword1" with Language: "Custom"
+# [{'Line': 1, 'Column': 15, 'Word': 'custombadword1', 'Language': 'Custom'}]
+print(results_custom_only)
+
+# Option B: Custom list COMBINED with a built-in language
+results_custom_plus_english = detect_profanity(sample_text, language="English", custom_words_list=my_custom_words)
+# results_custom_plus_english will detect "custombadword1" and "asshole"
+# Language will be "Custom + English"
+# [
+#   {'Line': 1, 'Column': 15, 'Word': 'custombadword1', 'Language': 'Custom + English'},
+#   {'Line': 1, 'Column': 43, 'Word': 'asshole', 'Language': 'Custom + English'}
+# ]
+print(results_custom_plus_english)
 ```
+
+**3. Loading Custom Profanity Words from a File**
+
+ValX provides a helper function to load words from a text file (one word per line, '#' for comments).
+
+```python
+from valx import detect_profanity, load_custom_profanity_from_file
+
+# Assume 'my_profanity_file.txt' contains:
+# customfileword1
+# # this is a comment
+# customfileword2
+
+custom_words_from_file = load_custom_profanity_from_file("my_profanity_file.txt")
+# custom_words_from_file will be: ['customfileword1', 'customfileword2']
+
+sample_text_for_file = ["Text with customfileword1 and built-in shit."]
+
+# Use file-loaded list with English built-in list
+results_file_plus_english = detect_profanity(
+    sample_text_for_file,
+    language="English",
+    custom_words_list=custom_words_from_file
+)
+# Detects "customfileword1" and "shit", Language: "Custom + English"
+print(results_file_plus_english)
+
+# Use file-loaded list ONLY
+results_file_only = detect_profanity(
+    sample_text_for_file,
+    language=None, # Important: set language to None
+    custom_words_list=custom_words_from_file
+)
+# Detects only "customfileword1", Language: "Custom"
+print(results_file_only)
+```
+
+**Output Format for `detect_profanity`**
+
+The `detect_profanity` function returns a list of dictionaries. Each dictionary includes:
+- `"Line"`: The line number (1-indexed).
+- `"Column"`: The column number (1-indexed) where the profanity starts.
+- `"Word"`: The detected profanity word.
+- `"Language"`: Indicates the source of the word list:
+    - `<LanguageName>` (e.g., "English"): If only a built-in language list was used.
+    - `"Custom"`: If `language=None` and only a `custom_words_list` was used.
+    - `"Custom + <LanguageName>"` (e.g., "Custom + English"): If both a built-in list and `custom_words_list` were used.
+    - `"Custom + All"`: If `language='All'` and `custom_words_list` were used.
+
+
+**4. Removing Profanity**
+
+`remove_profanity` works similarly, accepting `language` and `custom_words_list` parameters.
+
+```python
+from valx import remove_profanity, load_custom_profanity_from_file
+
+sample_text = ["This is fuck, custombadword1, and text with customfileword1."]
+my_custom_words = ["custombadword1"]
+custom_words_from_file = load_custom_profanity_from_file("my_profanity_file.txt") # Assuming it contains 'customfileword1'
+
+# Remove profanity using English built-in + my_custom_words + custom_words_from_file
+all_custom_words = list(set(my_custom_words + custom_words_from_file)) # Combine and unique
+
+cleaned_text = remove_profanity(
+    sample_text,
+    output_file="cleaned_output.txt", # Optional: saves to file
+    language="English",
+    custom_words_list=all_custom_words
+)
+# cleaned_text will have "fuck", "custombadword1", and "customfileword1" replaced with "bad word".
+# e.g., ["This is bad word, bad word, and text with bad word."]
+print(cleaned_text)
+```
+
+The `load_profanity_words` function (used internally) also accepts `language` and `custom_words_list` if you need direct access to the word lists.
 
 ### Detect Sensitive Information
 

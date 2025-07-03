@@ -1,0 +1,10 @@
+# This is a custom profanity list for testing
+custombadword1
+supersecretcurse
+anotherone
+
+# Test empty lines and comments below
+
+#anothercomment
+testwordalpha
+testwordbeta
