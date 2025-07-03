@@ -16,6 +16,21 @@ An open-source Python library for data cleaning tasks. It includes functions for
 > [!NOTE]
 > ValX will automatically install a version of `scikit-learn` that is compatible with your device if you don't have one already.
 
+## Changes in 0.2.5
+
+ValX v0.2.5 introduces enhanced flexibility for profanity filtering by adding support for custom profanity lists:
+
+-   **Custom Profanity Word Lists**: Users can now provide their own lists of profane words directly as Python lists to the `detect_profanity` and `remove_profanity` functions via the new `custom_words_list` parameter.
+-   **Standalone Custom Lists**: Utilize your custom profanity list exclusively by setting the `language` parameter to `None`. ValX will then only use the words provided in `custom_words_list`.
+-   **Combined Lists**: Use a custom list in conjunction with ValX's built-in language-specific wordlists. Simply provide both a `language` (e.g., "English") and your `custom_words_list`. ValX will use the combined set of words.
+-   **Loading Custom Lists from File**: A new helper function, `load_custom_profanity_from_file(filepath)`, allows you to easily load custom profanity words from a text file.
+    -   **File Format**: The file should contain one profanity word per line.
+    -   Lines starting with a hash symbol (`#`) are treated as comments and ignored.
+    -   Empty lines or lines containing only whitespace are also ignored.
+-   **Updated Detection Reporting**: The `detect_profanity` function's output now specifies the source of detected profanity more clearly (e.g., "Custom", "Custom + English").
+
+These features give users greater control over the profanity filtering process, allowing for more tailored and specific use cases.
+
 ## Changes in 0.2.4
 
 Fixed a major incompatibility issue with `scikit-learn` due to version changes in `scikit-learn v1.3.0` which causes compatibility issues with versions later than `1.2.2`. ValX can now be used with `scikit-learn` versions earlier and later than `1.3.0`!
