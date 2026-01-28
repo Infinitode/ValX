@@ -1,4 +1,5 @@
 # ValX
+
 ![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
 [![Code Size](https://img.shields.io/github/languages/code-size/infinitode/valx)](https://github.com/infinitode/valx)
 ![Downloads](https://pepy.tech/badge/valx)
@@ -16,18 +17,26 @@ An open-source Python library for data cleaning tasks. It includes functions for
 > [!NOTE]
 > ValX will automatically install a version of `scikit-learn` that is compatible with your device if you don't have one already.
 
+## Changes in 0.2.6
+
+ValX v0.2.6 fixes a major bug, view the issue here: https://github.com/Infinitode/ValX/issues/4, where profanity lists for multiple languages were missing, under wrong languages, or simply incomplete.
+
+Version 0.2.6 introduces fixes for this using the original language lists data, and includes new handling for languages, including:
+
+- Case insensitivity for language selection: "English", "EN", "en", or variants like "enGliSh" will all work for language selection in the `detect_profanity` and `remove_profanity` functions.
+
 ## Changes in 0.2.5
 
 ValX v0.2.5 introduces enhanced flexibility for profanity filtering by adding support for custom profanity lists:
 
--   **Custom Profanity Word Lists**: Users can now provide their own lists of profane words directly as Python lists to the `detect_profanity` and `remove_profanity` functions via the new `custom_words_list` parameter.
--   **Standalone Custom Lists**: Utilize your custom profanity list exclusively by setting the `language` parameter to `None`. ValX will then only use the words provided in `custom_words_list`.
--   **Combined Lists**: Use a custom list in conjunction with ValX's built-in language-specific wordlists. Simply provide both a `language` (e.g., "English") and your `custom_words_list`. ValX will use the combined set of words.
--   **Loading Custom Lists from File**: A new helper function, `load_custom_profanity_from_file(filepath)`, allows you to easily load custom profanity words from a text file.
-    -   **File Format**: The file should contain one profanity word per line.
-    -   Lines starting with a hash symbol (`#`) are treated as comments and ignored.
-    -   Empty lines or lines containing only whitespace are also ignored.
--   **Updated Detection Reporting**: The `detect_profanity` function's output now specifies the source of detected profanity more clearly (e.g., "Custom", "Custom + English").
+- **Custom Profanity Word Lists**: Users can now provide their own lists of profane words directly as Python lists to the `detect_profanity` and `remove_profanity` functions via the new `custom_words_list` parameter.
+- **Standalone Custom Lists**: Utilize your custom profanity list exclusively by setting the `language` parameter to `None`. ValX will then only use the words provided in `custom_words_list`.
+- **Combined Lists**: Use a custom list in conjunction with ValX's built-in language-specific wordlists. Simply provide both a `language` (e.g., "English") and your `custom_words_list`. ValX will use the combined set of words.
+- **Loading Custom Lists from File**: A new helper function, `load_custom_profanity_from_file(filepath)`, allows you to easily load custom profanity words from a text file.
+  - **File Format**: The file should contain one profanity word per line.
+  - Lines starting with a hash symbol (`#`) are treated as comments and ignored.
+  - Empty lines or lines containing only whitespace are also ignored.
+- **Updated Detection Reporting**: The `detect_profanity` function's output now specifies the source of detected profanity more clearly (e.g., "Custom", "Custom + English").
 
 These features give users greater control over the profanity filtering process, allowing for more tailored and specific use cases.
 
@@ -42,6 +51,7 @@ We've also removed `scikit-learn==1.2.2` as a dependency, as most versions of `s
 We have introduced a new optional `info_type` parameter into our `detect_sensitive_information`, and `remove_sensitive_information` functions, to allow you to have fine-grained control over what sensitive information you want to detect or remove.
 
 Also introduced more detection patterns for other types of sensitive information, including:
+
 - `"iban"`: International Bank Account Number.
 - `"mrn"`: Medical Record Number (may not work correctly, depending on provider and country).
 - `"icd10"`: International Classification of Diseases, Tenth Revision.
@@ -54,6 +64,7 @@ Also introduced more detection patterns for other types of sensitive information
 ## Changes in 0.2.2
 
 We have refactored and changed the `detect_profanity` function:
+
 - Removed unnecessary printing
 - Now returns more information about each found profanity, including `Line`, `Column`, `Word`, and `Language`.
 
@@ -95,36 +106,65 @@ Please ensure that you have one of these Python versions installed before using 
 - **Remove Hate Speech**: Remove hate speech or offensive speech in text, using AI.
 
 ### List of supported languages for profanity detection and removal
+
 Below is a complete list of all the available supported languages for ValX's profanity detection and removal functions which are valid values for `language`:
 
-- **All**
+- All
 - Arabic
+- AR
 - Czech
+- CS
 - Danish
+- DA
 - German
+- DE
 - English
+- EN
 - Esperanto
+- EO
 - Persian
 - Finnish
+- FI
 - Filipino
+- FIL
 - French
+- FR
 - French (CA)
+- FR-CA-U-SD-CAQC
 - Hindi
+- HI
 - Hungarian
+- HU
 - Italian
+- IT
 - Japanese
+- JA
 - Kabyle
+- KAB
 - Korean
+- KO
 - Dutch
+- NL
 - Norwegian
+- NO
 - Polish
+- PL
 - Portuguese
+- PT
 - Russian
+- RU
+- Spanish
+- ES
 - Swedish
+- SV
 - Thai
+- TH
 - Klingon
+- TLH
 - Turkish
+- TR
 - Chinese
+- ZH
 
 ## Usage
 
@@ -214,15 +254,15 @@ print(results_file_only)
 **Output Format for `detect_profanity`**
 
 The `detect_profanity` function returns a list of dictionaries. Each dictionary includes:
+
 - `"Line"`: The line number (1-indexed).
 - `"Column"`: The column number (1-indexed) where the profanity starts.
 - `"Word"`: The detected profanity word.
 - `"Language"`: Indicates the source of the word list:
-    - `<LanguageName>` (e.g., "English"): If only a built-in language list was used.
-    - `"Custom"`: If `language=None` and only a `custom_words_list` was used.
-    - `"Custom + <LanguageName>"` (e.g., "Custom + English"): If both a built-in list and `custom_words_list` were used.
-    - `"Custom + All"`: If `language='All'` and `custom_words_list` were used.
-
+  - `<LanguageName>` (e.g., "English"): If only a built-in language list was used.
+  - `"Custom"`: If `language=None` and only a `custom_words_list` was used.
+  - `"Custom + <LanguageName>"` (e.g., "Custom + English"): If both a built-in list and `custom_words_list` were used.
+  - `"Custom + All"`: If `language='All'` and `custom_words_list` were used.
 
 **4. Removing Profanity**
 
@@ -283,6 +323,7 @@ outcome_of_detection = detect_hate_speech("You are stupid.")
 
 > [!IMPORTANT]
 > The model's possible outputs are:
+>
 > - `['Hate Speech']`: The text was flagged and contained hate speech.
 > - `['Offensive Speech']`: The text was flagged and contained offensive speech.
 > - `['No Hate and Offensive Speech']`: The text was not flagged for any hate speech or offensive speech.
@@ -299,7 +340,9 @@ Contributions are welcome! If you encounter any issues, have suggestions, or wan
 ValX is released under the terms of the **MIT License (Modified)**. Please see the [LICENSE](https://github.com/infinitode/valx/blob/main/LICENSE) file for the full text.
 
 ### Derived licenses
+
 ---
+
 ValX uses data from this GitHub repository:
 https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/
 © 2012-2020 Shutterstock, Inc.

@@ -33,7 +33,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     """
     # Profanity words as a string
     PROFANITY_WORDS = """
-    $Arabic$
+    $Arabic|AR$
     سكس
     طيز
     شرج
@@ -72,7 +72,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     خول
     قحبة
     لبوة
-    $Czech$
+    $Czech|CS$
     bordel
     buzna
     čumět
@@ -114,7 +114,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     zkurvysyn
     zmrd
     žrát
-    $Danish$
+    $Danish|DA$
     anus
     bøsserøv
     cock
@@ -135,7 +135,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     røvskæg
     røvspræke
     shit
-    $German$
+    $German|DE$
     analritter
     arsch
     arschficker
@@ -202,7 +202,127 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     wichse
     wichsen
     wichser
-    $English$
+    $Hindi|HI$
+    aand
+    aandu
+    balatkar
+    balatkari
+    behen chod
+    beti chod
+    bhadva
+    bhadve
+    bhandve
+    bhangi
+    bhootni ke
+    bhosad
+    bhosadi ke
+    boobe
+    chakke
+    chinaal
+    chinki
+    chod
+    chodu
+    chodu bhagat
+    chooche
+    choochi
+    choope
+    choot
+    choot ke baal
+    chootia
+    chootiya
+    chuche
+    chuchi
+    chudaap
+    chudai khanaa
+    chudam chudai
+    chude
+    chut
+    chut ka chuha
+    chut ka churan
+    chut ka mail
+    chut ke baal
+    chut ke dhakkan
+    chut maarli
+    chutad
+    chutadd
+    chutan
+    chutia
+    chutiya
+    gaand
+    gaandfat
+    gaandmasti
+    gaandufad
+    gandfattu
+    gandu
+    gashti
+    gasti
+    ghassa
+    ghasti
+    gucchi
+    gucchu
+    harami
+    haramzade
+    hawas
+    hawas ke pujari
+    hijda
+    hijra
+    jhant
+    jhant chaatu
+    jhant ka keeda
+    jhant ke baal
+    jhant ke pissu
+    jhantu
+    kamine
+    kaminey
+    kanjar
+    kutta
+    kutta kamina
+    kutte ki aulad
+    kutte ki jat
+    kuttiya
+    loda
+    lodu
+    lund
+    lund choos
+    lund ka bakkal
+    lund khajoor
+    lundtopi
+    lundure
+    maa ki chut
+    maal
+    madar chod
+    madarchod
+    madhavchod
+    mooh mein le
+    mutth
+    mutthal
+    najayaz
+    najayaz aulaad
+    najayaz paidaish
+    paki
+    pataka
+    patakha
+    raand
+    randaap
+    randi
+    randi rona
+    saala
+    saala kutta
+    saali kutti
+    saali randi
+    suar
+    suar ke lund
+    suar ki aulad
+    tatte
+    tatti
+    teri maa ka bhosada
+    teri maa ka boba chusu
+    teri maa ki behenchod 
+    teri maa ki chut
+    tharak
+    tharki
+    tu chuda
+    $English|EN$
     2g1c
     2 girls 1 cup
     acrotomophilia
@@ -606,7 +726,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     yiffy
     zoophilia
     🖕
-    $Esperanto$
+    $Esperanto|EO$
     bugren
     bugri
     bugru
@@ -644,75 +764,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     piĉen
     piĉo
     zamenfek
-    Asesinato
-    asno
-    bastardo
-    Bollera
-    Cabrón
-    Caca
-    Chupada
-    Chupapollas
-    Chupetón
-    concha
-    Concha de tu madre
-    Coño
-    Coprofagía
-    Culo
-    Drogas
-    Esperma
-    Fiesta de salchichas
-    Follador
-    Follar
-    Gilipichis
-    Gilipollas
-    Hacer una paja
-    Haciendo el amor
-    Heroína
-    Hija de puta
-    Hijaputa
-    Hijo de puta
-    Hijoputa
-    Idiota
-    Imbécil
-    infierno
-    Jilipollas
-    Kapullo
-    Lameculos
-    Maciza
-    Macizorra
-    maldito
-    Mamada
-    Marica
-    Maricón
-    Mariconazo
-    martillo
-    Mierda
-    Nazi
-    Orina
-    Pedo
-    Pendejo
-    Pervertido
-    Pezón
-    Pinche
-    Pis
-    Prostituta
-    Puta
-    Racista
-    Ramera
-    Sádico
-    Semen
-    Sexo
-    Sexo oral
-    Soplagaitas
-    Soplapollas
-    Tetas grandes
-    Tía buena
-    Travesti
-    Trio
-    Verga
-    vete a la mierda
-    Vulva
-    $Persian$
+    $Persian|FA$
     آب کیر
     ارگاسم
     برهنه
@@ -889,7 +941,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     vituttaa
     vitutus
     äpärä
-    $Filipino$
+    $Filipino|FIL$
     puta ka
     putang ina
     tang ina
@@ -904,7 +956,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     anak ka ng puta
     ulol
     jakol
-    $French$
+    $French|FR$
     baiser
     bander
     bigornette
@@ -996,7 +1048,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     turlute
     zigounette
     zizi
-    $French (CA)$
+    $French (CA)|FR-CA-U-SD-CAQC$
     noune
     osti
     criss
@@ -1004,127 +1056,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     calice
     tabarnak
     viarge
-    $Hindi$
-    aand
-    aandu
-    balatkar
-    balatkari
-    behen chod
-    beti chod
-    bhadva
-    bhadve
-    bhandve
-    bhangi
-    bhootni ke
-    bhosad
-    bhosadi ke
-    boobe
-    chakke
-    chinaal
-    chinki
-    chod
-    chodu
-    chodu bhagat
-    chooche
-    choochi
-    choope
-    choot
-    choot ke baal
-    chootia
-    chootiya
-    chuche
-    chuchi
-    chudaap
-    chudai khanaa
-    chudam chudai
-    chude
-    chut
-    chut ka chuha
-    chut ka churan
-    chut ka mail
-    chut ke baal
-    chut ke dhakkan
-    chut maarli
-    chutad
-    chutadd
-    chutan
-    chutia
-    chutiya
-    gaand
-    gaandfat
-    gaandmasti
-    gaandufad
-    gandfattu
-    gandu
-    gashti
-    gasti
-    ghassa
-    ghasti
-    gucchi
-    gucchu
-    harami
-    haramzade
-    hawas
-    hawas ke pujari
-    hijda
-    hijra
-    jhant
-    jhant chaatu
-    jhant ka keeda
-    jhant ke baal
-    jhant ke pissu
-    jhantu
-    kamine
-    kaminey
-    kanjar
-    kutta
-    kutta kamina
-    kutte ki aulad
-    kutte ki jat
-    kuttiya
-    loda
-    lodu
-    lund
-    lund choos
-    lund ka bakkal
-    lund khajoor
-    lundtopi
-    lundure
-    maa ki chut
-    maal
-    madar chod
-    madarchod
-    madhavchod
-    mooh mein le
-    mutth
-    mutthal
-    najayaz
-    najayaz aulaad
-    najayaz paidaish
-    paki
-    pataka
-    patakha
-    raand
-    randaap
-    randi
-    randi rona
-    saala
-    saala kutta
-    saali kutti
-    saali randi
-    suar
-    suar ke lund
-    suar ki aulad
-    tatte
-    tatti
-    teri maa ka bhosada
-    teri maa ka boba chusu
-    teri maa ki behenchod 
-    teri maa ki chut
-    tharak
-    tharki
-    tu chuda
-    $Hungarian$
+    $Hungarian|HU$
     balfasz
     balfaszok
     balfaszokat
@@ -1221,7 +1153,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     szarok
     szarokat
     szart
-    $Italian$
+    $Italian|IT$
     allupato
     ammucchiata
     anale
@@ -1390,7 +1322,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     zinne
     zio cantante
     zoccola
-    $Japanese$
+    $Japanese|JA$
     3p
     g スポット
     s ＆ m
@@ -1571,7 +1503,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     宦官
     肛門
     膣
-    $Kabyle$
+    $Kabyle|KAB$
     abbuc
     aεeṭṭuḍ
     aḥeččun
@@ -1594,7 +1526,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     iḥeččunen
     uqan
     taxna
-    $Korean$
+    $Korean|KO$
     강간
     개새끼
     개자식
@@ -1667,7 +1599,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     후레아들
     후장
     희쭈그리
-    $Dutch$
+    $Dutch|NL$
     aardappels afgieten
     achter het raam zitten
     afberen
@@ -1858,7 +1790,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     zeiker
     zuigen
     zuiplap
-    $Norwegian$
+    $Norwegian|NO$
     asshole
     dritt
     drittsekk
@@ -1899,7 +1831,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     ståpikkene
     ståpikker
     svartheiteste
-    $Polish$
+    $Polish|PL$
     burdel
     burdelmama
     chuj
@@ -1954,7 +1886,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     syf
     wkurwiać
     zajebisty
-    $Portuguese$
+    $Portuguese|PT$
     aborto
     amador
     ânus
@@ -2031,7 +1963,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     vibrador
     xana
     xochota
-    $Russian$
+    $Russian|RU$
     bychara
     byk
     chernozhopyi
@@ -2183,7 +2115,76 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     хуй
     хуйнуть
     хуй пинать
-    $Swedish$
+    $Spanish|ES$
+    Asesinato
+    asno
+    bastardo
+    Bollera
+    Cabrón
+    Caca
+    Chupada
+    Chupapollas
+    Chupetón
+    concha
+    Concha de tu madre
+    Coño
+    Coprofagía
+    Culo
+    Drogas
+    Esperma
+    Fiesta de salchichas
+    Follador
+    Follar
+    Gilipichis
+    Gilipollas
+    Hacer una paja
+    Haciendo el amor
+    Heroína
+    Hija de puta
+    Hijaputa
+    Hijo de puta
+    Hijoputa
+    Idiota
+    Imbécil
+    infierno
+    Jilipollas
+    Kapullo
+    Lameculos
+    Maciza
+    Macizorra
+    maldito
+    Mamada
+    Marica
+    Maricón
+    Mariconazo
+    martillo
+    Mierda
+    Nazi
+    Orina
+    Pedo
+    Pendejo
+    Pervertido
+    Pezón
+    Pinche
+    Pis
+    Prostituta
+    Puta
+    Racista
+    Ramera
+    Sádico
+    Semen
+    Sexo
+    Sexo oral
+    Soplagaitas
+    Soplapollas
+    Tetas grandes
+    Tía buena
+    Travesti
+    Trio
+    Verga
+    vete a la mierda
+    Vulva
+    $Swedish|SV$
     arsle
     brutta
     discofitta
@@ -2227,7 +2228,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     sås
     sätta på
     tusan
-    $Thai$
+    $Thai|TH$
     กระดอ
     กระเด้า
     กระหรี่
@@ -2259,11 +2260,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     เหี้ย
     อมนกเขา
     ไอ้ควาย
-    $Klingon$
-    ghuy'cha'
-    QI'yaH
-    Qu'vatlh
-    $Turkish$
+    $Turkish|TR$
     am
     amcığa
     amcığı
@@ -2406,7 +2403,11 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     yarakların
     yarakta
     yaraktan
-    $Chinese$
+    $Klingon|TLH$
+    ghuy'cha'
+    QI'yaH
+    Qu'vatlh
+    $Chinese|ZH$
     13.
     13点
     三级片
@@ -2736,27 +2737,29 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
         line = line.strip()
         if line.startswith("$") and line.endswith("$"):
             if current_language:
-                profanity_lists[current_language] = current_words
+                for lang in current_language.split('|'):
+                    profanity_lists[lang.strip().lower()] = current_words
                 current_words = []
             current_language = line.strip("$")
         elif line:
             current_words.append(line)
 
     if current_language:
-        profanity_lists[current_language] = current_words
+        for lang in current_language.split('|'):
+            profanity_lists[lang.strip().lower()] = current_words
 
     loaded_words = []
     if language is None:
         if not custom_words_list:
             raise ValueError("If language is None, custom_words_list must be provided and non-empty.")
         loaded_words = list(custom_words_list) # Use a copy
-    elif language == 'All':
+    elif language.lower() == "all":
         for words in profanity_lists.values():
             loaded_words.extend(words)
         if custom_words_list:
             loaded_words.extend(w for w in custom_words_list if w not in loaded_words)
     else:
-        loaded_words = list(profanity_lists.get(language, [])) # Use a copy
+        loaded_words = list(profanity_lists.get(language.lower(), [])) # Use a copy
         if custom_words_list:
             loaded_words.extend(w for w in custom_words_list if w not in loaded_words)
 
@@ -2809,11 +2812,11 @@ def detect_profanity(text_data, language='English', custom_words_list: list[str]
         text_data (list): A list of strings representing the text data to analyze.
         language (str, optional): The language used to detect profanity. Defaults to 'English'.
                                   Can be None if custom_words_list is provided.
-                                  Available languages include: All, Arabic, Czech, Danish, German,
-                                  English, Esperanto, Persian, Finnish, Filipino, French,
-                                  French (CA), Hindi, Hungarian, Italian, Japanese, Kabyle,
-                                  Korean, Dutch, Norwegian, Polish, Portuguese, Russian,
-                                  Swedish, Thai, Klingon, Turkish, Chinese.
+                                  Available languages include: All, Arabic, AR, Czech, CS, Danish, DA, German, DE,
+                                  English, EN, Esperanto, EO, Persian, Finnish, FI, Filipino, FIL, French, FR,
+                                  French (CA), FR-CA-U-SD-CAQC, Hindi, HI, Hungarian, HU, Italian, IT, Japanese, JA, Kabyle, KAB, 
+                                  Korean, KO, Dutch, NL, Norwegian, NO, Polish, PL, Portuguese, PT, Russian, RU, Spanish, ES, 
+                                  Swedish, SV, Thai, TH, Klingon, TLH, Turkish, TR, Chinese, ZH.
         custom_words_list (list[str], optional): A list of custom profanity words. Defaults to None.
     Returns:
         list: A list of dictionaries where each dictionary represents a detected instance of profanity.
