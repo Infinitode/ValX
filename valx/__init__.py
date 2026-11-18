@@ -1,37 +1,22 @@
-import os
-import re
+"""Text filters for profanity, sensitive information, and offensive speech.
 
-# New version, that includes AI detection
-import pickle
-from sklearn import __version__ as sklearnversion
-from sklearn.tree import DecisionTreeClassifier  # Import the DecisionTreeClassifier class
-from sklearn.feature_extraction.text import CountVectorizer  # Import the CountVectorizer class
-
-'''
 ValX uses data from this GitHub repository:
 https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/
 © 2012-2020 Shutterstock, Inc.
 
 Creative Commons Attribution 4.0 International License:
 https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/LICENSE
-'''
+"""
 
-def load_profanity_words(language='English', custom_words_list: list[str] = None):
-    """
-    Load profanity words for the specified language, optionally including a custom list.
+import os
+import pickle
+import re
+from functools import lru_cache
+from typing import Optional
 
-    Args:
-        language (str, optional): The language for which to load profanity words.
-                                  Defaults to 'English'. Can be None to use only custom_words_list.
-        custom_words_list (list[str], optional): A list of custom profanity words. Defaults to None.
 
-    Returns:
-        list: A list of profanity words.
-
-    Raises:
-        ValueError: If language is None and custom_words_list is None or empty.
-    """
-    # Profanity words as a string
+@lru_cache(maxsize=1)
+def _builtin_profanity_lists():
     PROFANITY_WORDS = """
     $Arabic|AR$
     سكس
@@ -810,7 +795,7 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     لش
     منی
     هرزه
-    $Finnish$
+    $Finnish|FI$
     alfred nussi
     bylsiä
     haahka
@@ -2729,302 +2714,225 @@ def load_profanity_words(language='English', custom_words_list: list[str] = None
     硬膠
     """
 
-    profanity_lists = {}
-    current_language = None
+    profanity_lists = {"all": []}
     current_words = []
-    
-    for line in PROFANITY_WORDS.split('\n'):
+    for line in PROFANITY_WORDS.splitlines():
         line = line.strip()
         if line.startswith("$") and line.endswith("$"):
-            if current_language:
-                for lang in current_language.split('|'):
-                    profanity_lists[lang.strip().lower()] = current_words
-                current_words = []
-            current_language = line.strip("$")
+            current_words = []
+            for alias in line[1:-1].split('|'):
+                profanity_lists[alias.strip().lower()] = current_words
         elif line:
             current_words.append(line)
+            profanity_lists['all'].append(line)
 
-    if current_language:
-        for lang in current_language.split('|'):
-            profanity_lists[lang.strip().lower()] = current_words
+    return {alias: tuple(dict.fromkeys(words)) for alias, words in profanity_lists.items()}
 
-    loaded_words = []
-    if language is None:
-        if not custom_words_list:
-            raise ValueError("If language is None, custom_words_list must be provided and non-empty.")
-        loaded_words = list(custom_words_list) # Use a copy
-    elif language.lower() == "all":
-        for words in profanity_lists.values():
-            loaded_words.extend(words)
-        if custom_words_list:
-            loaded_words.extend(w for w in custom_words_list if w not in loaded_words)
-    else:
-        loaded_words = list(profanity_lists.get(language.lower(), [])) # Use a copy
-        if custom_words_list:
-            loaded_words.extend(w for w in custom_words_list if w not in loaded_words)
 
-    return list(set(loaded_words)) # Return unique words
+def _profanity_words(language, custom_words_list):
+    custom_words = []
+    if custom_words_list is not None:
+        if isinstance(custom_words_list, str):
+            raise TypeError("custom_words_list must be a list of strings, not a single string.")
+        for word in custom_words_list:
+            if not isinstance(word, str):
+                raise TypeError("Each custom profanity word must be a string.")
+            word = word.strip()
+            if word:
+                custom_words.append(word)
+
+    if language is None and not custom_words:
+        raise ValueError("If language is None, provide at least one non-blank custom profanity word.")
+
+    built_in = () if language is None else _builtin_profanity_lists().get(language.strip().lower(), ())
+    return tuple(dict.fromkeys((*built_in, *custom_words))), bool(custom_words)
+
+
+def load_profanity_words(language='English', custom_words_list: Optional[list[str]] = None) -> list[str]:
+    """Return unique words for a language (or 'All'), optionally with custom words.
+
+    Custom words are stripped of surrounding whitespace; blank entries are ignored.
+    If language is None, at least one non-blank custom word is required.
+    """
+    words, _ = _profanity_words(language, custom_words_list)
+    return list(words)
 
 
 def load_custom_profanity_from_file(filepath: str) -> list[str]:
-    """
-    Loads a custom list of profanity words from a file.
+    """Load a UTF-8 file of custom words, one entry per line.
 
-    The file should contain one word per line. Lines starting with '#' will be ignored as comments.
-    Empty lines or lines with only whitespace will also be ignored.
-
-    Args:
-        filepath (str): The path to the file containing custom profanity words.
-
-    Returns:
-        list[str]: A list of words loaded from the file.
-
-    Raises:
-        FileNotFoundError: If the specified filepath does not exist.
-        IOError: For other file reading issues.
+    Blank lines and lines starting with '#' after stripping whitespace are
+    ignored. File reading errors propagate to the caller.
     """
     custom_words = []
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            for line in f:
-                word = line.strip()
-                if word and not word.startswith('#'):
-                    custom_words.append(word)
-    except FileNotFoundError:
-        # Re-raise FileNotFoundError to be explicit, or handle as per specific project policy
-        # For example, could log a warning and return empty list:
-        # print(f"Warning: File not found at {filepath}. Returning empty custom word list.")
-        # return []
-        raise
-    except IOError as e:
-        # Handle other IO errors, perhaps log them or raise a more generic error
-        # print(f"Warning: Error reading file {filepath}: {e}. Returning empty custom word list.")
-        # return []
-        raise IOError(f"Error reading custom profanity file {filepath}: {e}")
+    with open(filepath, 'r', encoding='utf-8-sig') as f:
+        for line in f:
+            word = line.strip()
+            if word and not word.startswith('#'):
+                custom_words.append(word)
     return custom_words
 
 
-def detect_profanity(text_data, language='English', custom_words_list: list[str] = None):
-    """
-    Detect profanity in text data using regex.
+@lru_cache(maxsize=32)
+def _profanity_pattern(words):
+    if not words:
+        return None
+    # Escape literal terms and prefer a phrase over a shorter word at the same position.
+    alternatives = '|'.join(re.escape(word) for word in sorted(words, key=len, reverse=True))
+    return re.compile(rf'(?<!\w)(?:{alternatives})(?!\w)', re.IGNORECASE)
 
-    Args:
-        text_data (list): A list of strings representing the text data to analyze.
-        language (str, optional): The language used to detect profanity. Defaults to 'English'.
-                                  Can be None if custom_words_list is provided.
-                                  Available languages include: All, Arabic, AR, Czech, CS, Danish, DA, German, DE,
-                                  English, EN, Esperanto, EO, Persian, Finnish, FI, Filipino, FIL, French, FR,
-                                  French (CA), FR-CA-U-SD-CAQC, Hindi, HI, Hungarian, HU, Italian, IT, Japanese, JA, Kabyle, KAB, 
-                                  Korean, KO, Dutch, NL, Norwegian, NO, Polish, PL, Portuguese, PT, Russian, RU, Spanish, ES, 
-                                  Swedish, SV, Thai, TH, Klingon, TLH, Turkish, TR, Chinese, ZH.
-        custom_words_list (list[str], optional): A list of custom profanity words. Defaults to None.
-    Returns:
-        list: A list of dictionaries where each dictionary represents a detected instance of profanity.
-            Each dictionary contains the following keys:
-            - "Line" (int): The line number where the profanity was detected.
-            - "Column" (int): The column number (position in the line) where the profanity starts.
-            - "Word" (str): The detected profanity word.
-            - "Language" (str): The language string indicating the source of the profanity list.
-    """
-    profanity_keywords = load_profanity_words(language, custom_words_list)
-    detected = set()  # Use a set to store unique occurrences
 
-    display_language = "Custom"
-    if language:
-        if custom_words_list:
-            display_language = f"Custom + {language}"
-        else:
-            display_language = language
-    elif not custom_words_list:
-        # This case should ideally be prevented by load_profanity_words raising an error,
-        # but as a fallback, if somehow load_profanity_words returns empty and language is None
-        # and no custom_words_list, we avoid error here.
+def detect_profanity(text_data, language='English', custom_words_list: Optional[list[str]] = None):
+    """Detect profanity in an iterable of lines using a built-in or custom word list.
+
+    Language names and codes are case-insensitive. Use 'All' for all built-in
+    lists or None with a non-empty custom list to skip built-in words.
+
+    Returns non-overlapping matches in input order. Each match is a dictionary
+    with 1-based 'Line' and 'Column', the original matched text in 'Word', and
+    the word-list selection in 'Language'.
+    """
+    words, has_custom = _profanity_words(language, custom_words_list)
+    pattern = _profanity_pattern(words)
+    if pattern is None:
         return []
 
+    display_language = language or "Custom"
+    if language and has_custom:
+        display_language = f"Custom + {language}"
 
-    for i, line in enumerate(text_data):
-        # Skip lines with language markers (though less relevant if custom lists are primary)
-        if line.startswith("$") and line.endswith("$"):
-            continue
-
-        # Detect profanity
-        for profanity in profanity_keywords:
-            matches = re.finditer(r'\b{}\b'.format(re.escape(profanity)), line, flags=re.IGNORECASE)
-            for match in matches:
-                # Store with display_language, not the input `language` parameter
-                detected.add((i + 1, match.start() + 1, display_language, profanity))
-
-    detections = []  # Initialize detections as a list
-
-    if detected:
-        for line_num, col_num, lang_display_name, word in detected:
-            detection_info = {
-                "Line": line_num,
-                "Column": col_num,
-                "Word": word,
-                "Language": lang_display_name
-            }
-            detections.append(detection_info)
-
-    return detections
+    return [
+        {"Line": line_num, "Column": match.start() + 1, "Word": match.group(), "Language": display_language}
+        for line_num, line in enumerate(text_data, start=1)
+        for match in pattern.finditer(line)
+    ]
 
 
-def remove_profanity(text_data, output_file=None, language='English', custom_words_list: list[str] = None):
-    """
-    Remove profanity from text data.
-
-    Args:
-        text_data (list): A list of strings representing the text data to clean.
-        output_file (str, optional): The file path to write the cleaned data. If None, cleaned data is not written to a file.
-        language (str, optional): The language for which to remove profanity. Defaults to 'English'.
-                                  Can be None if custom_words_list is provided.
-        custom_words_list (list[str], optional): A list of custom profanity words. Defaults to None.
-
-    Returns:
-        list: A list of strings representing the cleaned text data.
-    """
-    profanity_keywords = load_profanity_words(language, custom_words_list)
-    cleaned_data = []
-
-    for line in text_data:
-        # Skip lines with language markers
-        if line.startswith("$") and line.endswith("$"):
-            continue
-
-        # Remove profanity
-        cleaned_line = line
-        for profanity in profanity_keywords:
-            cleaned_line = re.sub(r'\b{}\b'.format(re.escape(profanity)), 'bad word', cleaned_line, flags=re.IGNORECASE)
-        cleaned_data.append(cleaned_line)
-
-    # Write cleaned data to output file if provided
+def _save_cleaned_data(cleaned_data, output_file):
     if output_file:
         with open(output_file, 'w', encoding='utf-8') as file:
             file.write('\n'.join(cleaned_data))
-
     return cleaned_data
 
-def detect_sensitive_information(text_data, info_type=["email", "phone", "credit_card", "ssn", "id", "address", "ip", "iban", "mrn", "icd10", "geo_coords", "username", "file_path", "bitcoin_wallet", "ethereum_wallet"]):
-    """
-    Detect sensitive information patterns in the provided text data.
 
-    Args:
-        text_data (list of str): A list of strings representing the text data to be analyzed.
-        info_type (str or list of str, optional): One or more types of sensitive info to detect. Available types are: "email", "phone", "credit_card", "ssn", "id", "address", "ip", "iban", "mrn", "icd10", "geo_coords", "username", "file_path", "bitcoin_wallet", "ethereum_wallet". Uses all info types by default.
+def remove_profanity(text_data, output_file=None, language='English', custom_words_list: Optional[list[str]] = None):
+    """Replace the matches of detect_profanity with 'bad word'.
 
-    Returns:
-        list of tuple: A list of tuples containing detected sensitive information, each tuple
-            representing (line number, column index, type, value).
+    Returns a list of cleaned lines and optionally writes them to a UTF-8
+    output file.
     """
+    words, _ = _profanity_words(language, custom_words_list)
+    pattern = _profanity_pattern(words)
+    cleaned_data = list(text_data) if pattern is None else [pattern.sub('bad word', line) for line in text_data]
+    return _save_cleaned_data(cleaned_data, output_file)
+
+
+_SENSITIVE_PATTERNS = {
+    'email': re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b'),
+    'phone': re.compile(r'(?:\(\d{3}\)\s*|(?<!\w)(?:\d{3}[-.\s]?)?)\d{3}[-.\s]?\d{4}(?!\w)'),
+    'credit_card': re.compile(r'\b(?:\d[ -]*?){13,16}\b'),
+    'ssn': re.compile(r'\b\d{3}-?\d{2}-?\d{4}\b'),
+    'id': re.compile(r'\b[A-Za-z]{1,2}\d{6,9}\b'),
+    'address': re.compile(r'\b\d+\s\w+\s\w+,\s\w+,\s\w+\b'),
+    'ip': re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'),
+    'iban': re.compile(r'\b[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}\b'),
+    'mrn': re.compile(r'\b\d{5,10}\b'),
+    'icd10': re.compile(r'\b[A-TV-Z][0-9]{2}(?:\.[0-9A-TV-Z]{1,4})?\b'),
+    'geo_coords': re.compile(
+        r'(?<![\w.+-])[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?),\s*'
+        r'[-+]?(?:180(?:\.0+)?|(?:1[0-7]\d|[1-9]?\d)(?:\.\d+)?)(?!\w|\.\d)'
+    ),
+    'username': re.compile(r'@\w+'),
+    # Allow spaces in rooted directories; relative paths and basenames are single tokens.
+    'file_path': re.compile(
+        r'(?<![\w.@:/\\])'
+        r'(?:(?:[A-Za-z]:[\\/]|\\\\|~?[\\/])(?:[\w. -]+[\\/])*?|(?:[\w.-]+[\\/])*)'
+        r'[\w.-]+\.[A-Za-z]\w*(?![\w@/\\]|\.\w)'
+    ),
+    'bitcoin_wallet': re.compile(r'\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b'),
+    'ethereum_wallet': re.compile(r'\b0x[a-fA-F0-9]{40}\b'),
+}
+
+
+def _sensitive_patterns_for(info_type):
+    if info_type is None:
+        return _SENSITIVE_PATTERNS.items()
     if isinstance(info_type, str):
-        info_type = [info_type]  # Convert single string to list for consistent handling
+        info_type = [info_type]
+    return [(kind, _SENSITIVE_PATTERNS[kind]) for kind in info_type if kind in _SENSITIVE_PATTERNS]
 
-    # Dictionary to map info_type to regex patterns
-    regex_patterns = {
-        "email": r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-        "phone": r'\b(?:\d{3}[-.\s]??\d{3}[-.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-.\s]??\d{4}|\d{3}[-.\s]??\d{4})\b',
-        "credit_card": r'\b(?:\d[ -]*?){13,16}\b',
-        "ssn": r'\b\d{3}[-]?\d{2}[-]?\d{4}\b',
-        "id": r'\b[A-Za-z]{1,2}\d{6,9}\b',
-        "address": r'\b\d+\s\w+\s\w+,\s\w+,\s\w+\b',
-        "ip": r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b',
-        "iban": r'\b[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}\b',
-        "mrn": r'\b\d{5,10}\b',
-        "icd10": r'\b[A-TV-Z][0-9]{2}(?:\.[0-9A-TV-Z]{1,4})?\b',
-        "geo_coords": r'\b[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)\b',
-        "username": r'@\w+',
-        "file_path": r'([A-Za-z]:\\|/)?([-\w\s]+\\|/)*[-\w\s]+\.\w+',
-        "bitcoin_wallet": r'\b[13][a-km-zA-HJ-NP-Z1-9]{25,34}\b',
-        "ethereum_wallet": r'\b0x[a-fA-F0-9]{40}\b'
-    }
 
-    sensitive_info = []
-    
-    # Loop through each line and check for sensitive info types based on specified `info_type`
-    for i, line in enumerate(text_data):
-        for type_ in info_type:
-            pattern = regex_patterns.get(type_)
-            if pattern:
-                matches = re.finditer(pattern, line)
-                for match in matches:
-                    sensitive_info.append((i + 1, match.start(), type_.capitalize(), match.group()))
+def _sensitive_matches(line, patterns):
+    for kind, pattern in patterns:
+        for match in pattern.finditer(line):
+            yield kind, match
 
-    return sensitive_info
 
-def remove_sensitive_information(text_data, output_file=None, info_type=["email", "phone", "credit_card", "ssn", "id", "address", "ip", "iban", "mrn", "icd10", "geo_coords", "username", "file_path", "bitcoin_wallet", "ethereum_wallet"]):
+def detect_sensitive_information(text_data, info_type=None):
+    """Find likely sensitive information in an iterable of lines.
+
+    Pass one type, a list of types, or None (default) for all types: email,
+    phone, credit_card, ssn, id, address, ip, iban, mrn, icd10, geo_coords,
+    username, file_path, bitcoin_wallet, and ethereum_wallet.
+
+    Returns tuples of (1-based line, 0-based column, capitalized type, value).
+    Detection uses heuristics and may miss or misidentify sensitive information.
     """
-    Remove sensitive information patterns from the provided text data.
+    patterns = _sensitive_patterns_for(info_type)
+    return [
+        (line_num, match.start(), kind.capitalize(), match.group())
+        for line_num, line in enumerate(text_data, start=1)
+        for kind, match in _sensitive_matches(line, patterns)
+    ]
 
-    Args:
-        text_data (list of str): A list of strings representing the text data to be cleaned.
-        output_file (str, optional): Path to the output file where cleaned data will be saved.
-        info_type (str or list of str, optional): One or more types of sensitive info to detect and remove. Available types are: "email", "phone", "credit_card", "ssn", "id", "address", "ip", "iban", "mrn", "icd10", "geo_coords", "username", "file_path", "bitcoin_wallet", "ethereum_wallet". Uses all info types by default.
 
-    Returns:
-        list of str: A list of strings representing the cleaned text data.
+def remove_sensitive_information(text_data, output_file=None, info_type=None):
+    """Replace matching spans with '[SENSITIVE]', merging overlaps on each line.
+
+    Accepts the same info_type values as detect_sensitive_information. Returns
+    a list of cleaned lines and optionally writes them to a UTF-8 output file.
     """
-    # Detect sensitive information
-    sensitive_info = detect_sensitive_information(text_data, info_type=info_type)
-
+    patterns = _sensitive_patterns_for(info_type)
     cleaned_data = []
     for line in text_data:
-        cleaned_line = line
-        for _, _, _, info in sensitive_info:
-            cleaned_line = cleaned_line.replace(info, '[SENSITIVE]')
-        cleaned_data.append(cleaned_line)
+        spans = sorted(match.span() for _, match in _sensitive_matches(line, patterns))
+        parts = []
+        cursor = 0
+        for start, end in spans:
+            if start < cursor:
+                # Extend the already-redacted region without inserting another marker.
+                cursor = max(cursor, end)
+            else:
+                parts.extend((line[cursor:start], '[SENSITIVE]'))
+                cursor = end
+        parts.append(line[cursor:])
+        cleaned_data.append(''.join(parts))
+    return _save_cleaned_data(cleaned_data, output_file)
 
-    # Write cleaned data to output file if provided
-    if output_file:
-        with open(output_file, 'w', encoding='utf-8') as file:
-            file.write('\n'.join(cleaned_data))
-    return cleaned_data
 
-# New version
 MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
-COUNT_VECTORIZER_PATH = os.path.join(MODEL_DIR, 'count_vectorizer.sav')
-DEFAULT_MODEL_FILENAME = "decision_tree_model.sav"
-UPGRADED_MODEL_FILENAME = "classifier_upgraded.pkl"
 
-# Check scikit-learn version
-SKLEARN_VERSION = tuple(map(int, sklearnversion.split(".")))
 
-# Set the model path based on the version
-if SKLEARN_VERSION >= (1, 3, 0):
-    DECISION_TREE_MODEL_PATH = os.path.join(MODEL_DIR, UPGRADED_MODEL_FILENAME)
-else:
-    DECISION_TREE_MODEL_PATH = os.path.join(MODEL_DIR, DEFAULT_MODEL_FILENAME)
+@lru_cache(maxsize=1)
+def _load_hate_speech_models():
+    from packaging.version import Version
+    from sklearn import __version__
 
-# Load the saved models
-model = pickle.load(open(DECISION_TREE_MODEL_PATH, 'rb'))
-cv = pickle.load(open(COUNT_VECTORIZER_PATH, 'rb'))
+    # scikit-learn 1.3 changed the serialized decision-tree layout.
+    filename = 'classifier_upgraded.pkl' if Version(__version__).release >= (1, 3) else 'decision_tree_model.sav'
+    with open(os.path.join(MODEL_DIR, filename), 'rb') as model_file:
+        model = pickle.load(model_file)
+    with open(os.path.join(MODEL_DIR, 'count_vectorizer.sav'), 'rb') as vectorizer_file:
+        vectorizer = pickle.load(vectorizer_file)
+    return model, vectorizer
+
 
 def detect_hate_speech(text):
-    """
-    Detect offensive language or hate speech in the provided text string, using an AI model.
+    """Classify one string. Returns a one-element NumPy array of labels."""
+    model, vectorizer = _load_hate_speech_models()
+    return model.predict(vectorizer.transform([text]))
 
-    Args:
-        text_data (list of str): A list of strings representing the text data to be cleaned.
-
-    Returns:
-        list of str: A list of strings representing the outcome of the detection.
-    """
-    text = cv.transform([text]).toarray()
-    return model.predict((text))
 
 def remove_hate_speech(text_data):
-    """
-    Remove offensive language or hate speech in the provided text data array, using an AI model.
-
-    Args:
-        text (str): A string representing the text data to be used for hate speech detection and offensive language detection.
-
-    Returns:
-        list of str: A list of strings representing the cleaned text data.
-    """
-    cleaned_data = []
-    for sentence in text_data:
-        outcome = detect_hate_speech(sentence)
-        if outcome != ['Hate Speech'] and outcome != ['Offensive Speech'] and outcome == ['No Hate and Offensive Speech']:
-            cleaned_data.append(sentence)
-    
-    return cleaned_data
+    """Return the lines classified as neither hate speech nor offensive speech."""
+    return [line for line in text_data if detect_hate_speech(line)[0] == 'No Hate and Offensive Speech']

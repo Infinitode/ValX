@@ -1,21 +1,20 @@
 # ValX
 
-![Python Version](https://img.shields.io/badge/python-3.12-blue.svg)
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 [![Code Size](https://img.shields.io/github/languages/code-size/infinitode/valx)](https://github.com/infinitode/valx)
 ![Downloads](https://pepy.tech/badge/valx)
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
 ![PyPI Version](https://img.shields.io/pypi/v/valx)
+[![PyPI provenance](https://img.shields.io/badge/PyPI-view%20provenance-3775A9?logo=pypi&logoColor=white)](https://pypi.org/project/valx/#security)
 
 An open-source Python library for data cleaning tasks. It includes functions for profanity detection, and removal, and detection and removal of personal information. Also includes hate speech and offensive language detection and removal, using AI.
 
-> [!IMPORTANT]
-> If you are using `scikit-learn` versions older than version `1.3.0`, please also downgrade your version of `numpy` as stated below. Otherwise, you can continue to use your preferred version of `scikit-learn` without downgrading `numpy`.
->
-> Please downgrade to `numpy` version `1.26.4`. Our ValX **DecisionTreeClassifier** AI model, relies on lower versions of `numpy`, because it was trained on these versions.
-> For more information see: https://techoverflow.net/2024/07/23/how-to-fix-numpy-dtype-size-changed-may-indicate-binary-incompatibility-expected-96-from-c-header-got-88-from-pyobject/
+## Changes in 0.2.7
 
-> [!NOTE]
-> ValX will automatically install a version of `scikit-learn` that is compatible with your device if you don't have one already.
+- Sensitive information redaction now uses exact match positions on each line and merges overlaps, so it won't redact unrelated copies of a substring or leave part of an overlapping match exposed. Parenthesized phone area codes and signed coordinates are included in the matches.
+- Profanity filtering supports the documented Finnish `FI` alias and punctuation in custom terms. Detections are in text order and the `Word` value preserves the original casing. Lines surrounded by `$` are no longer silently dropped.
+- The bundled hate-speech models load on first use instead of at import time. This release requires Python 3.10 or newer.
+- The release workflow builds and tests the wheel and source distribution before publishing both to PyPI with signed attestations.
 
 ## Changes in 0.2.6
 
@@ -85,16 +84,7 @@ pip install valx
 
 ## Supported Python Versions
 
-ValX supports the following Python versions:
-
-- Python 3.6
-- Python 3.7
-- Python 3.8
-- Python 3.9
-- Python 3.10
-- Python 3.11/Later (Preferred)
-
-Please ensure that you have one of these Python versions installed before using ValX. ValX may not work as expected on lower versions of Python than the supported.
+ValX requires Python 3.10 or newer. CI covers Python 3.10 through 3.14.
 
 ## Features
 
@@ -107,64 +97,38 @@ Please ensure that you have one of these Python versions installed before using 
 
 ### List of supported languages for profanity detection and removal
 
-Below is a complete list of all the available supported languages for ValX's profanity detection and removal functions which are valid values for `language`:
+Pass a language name or code from the table as `language`. Both are case-insensitive. Use `All` to combine all built-in lists.
 
-- All
-- Arabic
-- AR
-- Czech
-- CS
-- Danish
-- DA
-- German
-- DE
-- English
-- EN
-- Esperanto
-- EO
-- Persian
-- Finnish
-- FI
-- Filipino
-- FIL
-- French
-- FR
-- French (CA)
-- FR-CA-U-SD-CAQC
-- Hindi
-- HI
-- Hungarian
-- HU
-- Italian
-- IT
-- Japanese
-- JA
-- Kabyle
-- KAB
-- Korean
-- KO
-- Dutch
-- NL
-- Norwegian
-- NO
-- Polish
-- PL
-- Portuguese
-- PT
-- Russian
-- RU
-- Spanish
-- ES
-- Swedish
-- SV
-- Thai
-- TH
-- Klingon
-- TLH
-- Turkish
-- TR
-- Chinese
-- ZH
+| Language name | Code |
+| --- | --- |
+| Arabic | `AR` |
+| Czech | `CS` |
+| Danish | `DA` |
+| German | `DE` |
+| English | `EN` |
+| Esperanto | `EO` |
+| Persian | `FA` |
+| Finnish | `FI` |
+| Filipino | `FIL` |
+| French | `FR` |
+| French (CA) | `FR-CA-U-SD-CAQC` |
+| Hindi | `HI` |
+| Hungarian | `HU` |
+| Italian | `IT` |
+| Japanese | `JA` |
+| Kabyle | `KAB` |
+| Korean | `KO` |
+| Dutch | `NL` |
+| Norwegian | `NO` |
+| Polish | `PL` |
+| Portuguese | `PT` |
+| Russian | `RU` |
+| Spanish | `ES` |
+| Swedish | `SV` |
+| Thai | `TH` |
+| Klingon | `TLH` |
+| Turkish | `TR` |
+| Chinese | `ZH` |
 
 ## Usage
 
@@ -210,7 +174,7 @@ results_custom_plus_english = detect_profanity(sample_text, language="English", 
 # Language will be "Custom + English"
 # [
 #   {'Line': 1, 'Column': 15, 'Word': 'custombadword1', 'Language': 'Custom + English'},
-#   {'Line': 1, 'Column': 43, 'Word': 'asshole', 'Language': 'Custom + English'}
+#   {'Line': 1, 'Column': 39, 'Word': 'asshole', 'Language': 'Custom + English'}
 # ]
 print(results_custom_plus_english)
 ```
@@ -253,11 +217,11 @@ print(results_file_only)
 
 **Output Format for `detect_profanity`**
 
-The `detect_profanity` function returns a list of dictionaries. Each dictionary includes:
+The `detect_profanity` function returns non-overlapping matches in text order. When two terms match at the same position, the longer one wins. Each dictionary includes:
 
 - `"Line"`: The line number (1-indexed).
 - `"Column"`: The column number (1-indexed) where the profanity starts.
-- `"Word"`: The detected profanity word.
+- `"Word"`: The exact text that matched, with its original casing.
 - `"Language"`: Indicates the source of the word list:
   - `<LanguageName>` (e.g., "English"): If only a built-in language list was used.
   - `"Custom"`: If `language=None` and only a `custom_words_list` was used.
@@ -291,26 +255,23 @@ print(cleaned_text)
 
 The `load_profanity_words` function (used internally) also accepts `language` and `custom_words_list` if you need direct access to the word lists.
 
-### Detect Sensitive Information
+### Detect and Remove Sensitive Information
 
 ```python
-from valx import detect_sensitive_information
+from valx import detect_sensitive_information, remove_sensitive_information
 
-# Detect sensitive information
-detected_sensitive_info = detect_sensitive_information(sample_text)
+lines = ["Contact help@example.com or call (555) 123-4567."]
+print(detect_sensitive_information(lines, info_type="email"))
+# [(1, 8, 'Email', 'help@example.com')]
+
+print(remove_sensitive_information(lines, info_type=["email", "phone"]))
+# ['Contact [SENSITIVE] or call [SENSITIVE].']
 ```
 
-> [!NOTE]
-> We have updated this function, and it now includes an optional argument for `info_type`, which can be used to detect only specific types of sensitive information. It was also added to `remove_sensitive_information`.
+Pass one type, a list of types, or omit `info_type` to scan for all types. Detection reports a one-based line number and a **zero-based** column. Removal merges overlapping matches before inserting `[SENSITIVE]`.
 
-### Remove Sensitive Information
-
-```python
-from valx import remove_sensitive_information
-
-# Remove sensitive information
-cleaned_text = remove_sensitive_information(sample_text2)
-```
+> [!IMPORTANT]
+> These are pattern-based filters, not a guarantee of anonymization. They can miss sensitive values or flag ordinary text. For example, `file_path` looks for filenames with an extension and can miss filenames containing spaces. Review redacted text before sharing it.
 
 ### Detect Hate Speech And Offensive Language
 
@@ -330,6 +291,16 @@ outcome_of_detection = detect_hate_speech("You are stupid.")
 
 > [!NOTE]
 > See our [official documentation](https://infinitode-docs.gitbook.io/documentation/package-documentation/valx-package-documentation) for more examples on how to use **ValX**.
+
+### Model compatibility
+
+Only the hate-speech functions load the bundled scikit-learn models. Scikit-learn can warn when loading a model saved with a different version, and compatibility across versions is not guaranteed. If you use scikit-learn 1.2.2, use NumPy 1.x with it. The rule-based profanity and sensitive-information filters do not load either model.
+
+## PyPI provenance
+
+Releases published by the Trusted Publishing workflow attach a [PEP 740 publish attestation](https://docs.pypi.org/attestations/publish/v1/) to each distribution file. The [PyPI Security tab](https://pypi.org/project/valx/#security) shows the status and lets you inspect the wheel and source archive separately. Older uploads are not retroactively attested.
+
+For setup and verification steps, see the [maintainer release guide](https://github.com/Infinitode/ValX/blob/main/CONTRIBUTING.md#releasing-to-pypi).
 
 ## Contributing
 

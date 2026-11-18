@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "valx"
+version = "0.2.7"
+description = "Text filters for profanity, sensitive information, and offensive speech."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "LicenseRef-ValX-Modified-MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Infinitode Pty Ltd", email = "infinitode.ltd@gmail.com" }]
+dependencies = ["packaging", "scikit-learn"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Repository = "https://github.com/Infinitode/ValX"
+Issues = "https://github.com/Infinitode/ValX/issues"
+Documentation = "https://infinitode-docs.gitbook.io/documentation/package-documentation/valx-package-documentation"
+
+[tool.setuptools]
+packages = ["valx"]
+include-package-data = false
+
+[tool.setuptools.package-data]
+valx = ["models/*.pkl", "models/*.sav"]
