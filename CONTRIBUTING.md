@@ -8,7 +8,7 @@ Thank you for considering contributing to **ValX**! Contributions, whether they 
    Create a fork of this repository to your GitHub account and clone it locally.
 
 2. **Set Up the Environment**  
-   Use Python 3.9 or newer. In a virtual environment, install ValX for development and run its tests:
+   Use Python 3.10 or newer. In a virtual environment, install ValX for development and run its tests:
 
    ```bash
    python -m pip install -r requirements.txt

@@ -11,6 +11,7 @@ class ProfanityTests(unittest.TestCase):
     def test_language_names_and_codes_are_case_insensitive(self):
         for language, word in (
             ("enGliSh", "porn"), ("eN", "porn"), ("ES", "gilipollas"),
+            ("Persian", "پورن"), ("fA", "پورن"),
             ("Finnish", "perkele"), ("fI", "perkele"),
         ):
             with self.subTest(language=language):

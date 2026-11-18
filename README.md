@@ -1,6 +1,6 @@
 # ValX
 
-![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 [![Code Size](https://img.shields.io/github/languages/code-size/infinitode/valx)](https://github.com/infinitode/valx)
 ![Downloads](https://pepy.tech/badge/valx)
 ![License Compliance](https://img.shields.io/badge/license-compliance-brightgreen.svg)
@@ -13,7 +13,7 @@ An open-source Python library for data cleaning tasks. It includes functions for
 
 - Sensitive information redaction now uses exact match positions on each line and merges overlaps, so it won't redact unrelated copies of a substring or leave part of an overlapping match exposed. Parenthesized phone area codes and signed coordinates are included in the matches.
 - Profanity filtering supports the documented Finnish `FI` alias and punctuation in custom terms. Detections are in text order and the `Word` value preserves the original casing. Lines surrounded by `$` are no longer silently dropped.
-- The bundled hate-speech models load on first use instead of at import time. Package metadata now reflects the Python 3.9 minimum already required by ValX's type annotations.
+- The bundled hate-speech models load on first use instead of at import time. This release requires Python 3.10 or newer.
 - The release workflow builds and tests the wheel and source distribution before publishing both to PyPI with signed attestations.
 
 ## Changes in 0.2.6
@@ -84,7 +84,7 @@ pip install valx
 
 ## Supported Python Versions
 
-ValX requires Python 3.9 or newer. CI covers Python 3.9 through 3.14.
+ValX requires Python 3.10 or newer. CI covers Python 3.10 through 3.14.
 
 ## Features
 
@@ -97,65 +97,38 @@ ValX requires Python 3.9 or newer. CI covers Python 3.9 through 3.14.
 
 ### List of supported languages for profanity detection and removal
 
-Below is a complete list of all the available supported languages for ValX's profanity detection and removal functions which are valid values for `language`:
+Pass a language name or code from the table as `language`. Both are case-insensitive. Use `All` to combine all built-in lists.
 
-- All
-- Arabic
-- AR
-- Czech
-- CS
-- Danish
-- DA
-- German
-- DE
-- English
-- EN
-- Esperanto
-- EO
-- Persian
-- FA
-- Finnish
-- FI
-- Filipino
-- FIL
-- French
-- FR
-- French (CA)
-- FR-CA-U-SD-CAQC
-- Hindi
-- HI
-- Hungarian
-- HU
-- Italian
-- IT
-- Japanese
-- JA
-- Kabyle
-- KAB
-- Korean
-- KO
-- Dutch
-- NL
-- Norwegian
-- NO
-- Polish
-- PL
-- Portuguese
-- PT
-- Russian
-- RU
-- Spanish
-- ES
-- Swedish
-- SV
-- Thai
-- TH
-- Klingon
-- TLH
-- Turkish
-- TR
-- Chinese
-- ZH
+| Language name | Code |
+| --- | --- |
+| Arabic | `AR` |
+| Czech | `CS` |
+| Danish | `DA` |
+| German | `DE` |
+| English | `EN` |
+| Esperanto | `EO` |
+| Persian | `FA` |
+| Finnish | `FI` |
+| Filipino | `FIL` |
+| French | `FR` |
+| French (CA) | `FR-CA-U-SD-CAQC` |
+| Hindi | `HI` |
+| Hungarian | `HU` |
+| Italian | `IT` |
+| Japanese | `JA` |
+| Kabyle | `KAB` |
+| Korean | `KO` |
+| Dutch | `NL` |
+| Norwegian | `NO` |
+| Polish | `PL` |
+| Portuguese | `PT` |
+| Russian | `RU` |
+| Spanish | `ES` |
+| Swedish | `SV` |
+| Thai | `TH` |
+| Klingon | `TLH` |
+| Turkish | `TR` |
+| Chinese | `ZH` |
 
 ## Usage
 
